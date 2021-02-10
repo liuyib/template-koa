@@ -1,0 +1,56 @@
+{
+  "name": "koa-template",
+  "version": "0.0.1",
+  "description": "A template repo for KOA",
+  "main": "index.js",
+  "scripts": {
+    "postinstall": "link-module-alias",
+    "dev": "cross-env NODE_ENV=development node index.js",
+    "dev:watch": "cross-env NODE_ENV=development nodemon index.js",
+    "prettier": "prettier --write app/**/**/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/liuyib/koa-template.git"
+  },
+  "keywords": [
+    "koa",
+    "template"
+  ],
+  "author": "liuyib <https://github.com/liuyib>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/liuyib/koa-template/issues"
+  },
+  "homepage": "https://github.com/liuyib/koa-template",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "basic-auth": "^2.0.1",
+    "bcrypt": "^5.0.0",
+    "dotenv": "^8.2.0",
+    "jsonwebtoken": "^8.5.1",
+    "koa": "^2.13.1",
+    "koa-body": "^4.2.0",
+    "koa-router": "^10.0.0",
+    "koa-static": "^5.0.0",
+    "lodash": "^4.17.20",
+    "mariadb": "^2.5.2",
+    "sequelize": "^6.3.5"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "link-module-alias": "^1.2.0",
+    "nodemon": "^2.0.7",
+    "prettier": "^2.2.1"
+  },
+  "_moduleAliases": {
+    "~root": ".",
+    "~api": "app/api",
+    "~config": "app/config",
+    "~lib": "app/lib",
+    "~middleware": "app/middleware",
+    "~model": "app/model",
+    "~service": "app/service",
+    "~validator": "app/validator"
+  }
+}
