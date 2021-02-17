@@ -70,7 +70,6 @@ class Init {
   /**
    * 加载异常类
    * @api private
-   * @returns
    * @returns {Object}
    */
   static loadException() {
