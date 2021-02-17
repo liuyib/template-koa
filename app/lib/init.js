@@ -3,6 +3,7 @@ const path = require('path')
 
 const config = require('~config/setting')
 const { readFile } = require('~lib/util')
+const { AUTH_LEVEL, HTTP_CODE } = require('~lib/enum')
 
 class Init {
   /**
@@ -29,6 +30,7 @@ class Init {
       __CONFIG__: this.loadConfig(),
       __ERROR__ : this.loadException(),
       __AUTH__  : this.loadAuth(),
+      __CODE__  : this.loadHttpCode(),
     })
   }
 
@@ -67,14 +69,26 @@ class Init {
    * 加载异常类
    * @api private
    * @returns
+   * @returns {Object}
    */
   static loadException() {
     return require('./http-exception')
   }
 
+  /**
+   * @api private
+   * @returns {Object}
+   */
   static loadAuth() {
-    const { AUTH_LEVEL } = require('~lib/enum')
     return AUTH_LEVEL
+  }
+
+  /**
+   * @api private
+   * @returns {Object}
+   */
+  static loadHttpCode() {
+    return HTTP_CODE
   }
 
   /**

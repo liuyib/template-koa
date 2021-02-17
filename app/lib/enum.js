@@ -42,7 +42,30 @@ const AUTH_LEVEL = {
   SUPER: 32,
 }
 
+/**
+ * 自定义 HTTP 业务码
+ */
+const HTTP_CODE = {
+  // 成功
+  SUCCESS: 0,
+  // 自定义错误
+  HTTP_EXCEPTION: 10001,
+  // 参数错误
+  PARAM_EXCEPTION: 10400,
+  // 资源未找到
+  NOT_FOUND: 10404,
+  // 禁止访问
+  FORBBIDEN: 10403,
+  // 授权失败
+  AUTH_FAILED: 10401,
+  // 点赞失败
+  LIKE_EXCEPTION: 60001,
+  // 取消点赞失败
+  DISLIKE_EXCEPTION: 60002,
+}
+
 module.exports = {
   LOGIN_TYPE,
   AUTH_LEVEL,
+  HTTP_CODE,
 }
