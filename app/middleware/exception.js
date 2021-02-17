@@ -1,5 +1,5 @@
 const _ = require('lodash')
-const { HttpException } = require('~lib/http-exception')
+const { HttpException, NotFound } = require('~lib/http-exception')
 
 /**
  * 全局异常处理
@@ -9,6 +9,10 @@ const catchError = () => {
   return async (ctx, next) => {
     try {
       await next()
+
+      if (ctx.status === 404) {
+        throw new NotFound()
+      }
     } catch (error) {
       const isDefinedException = error instanceof HttpException
 
