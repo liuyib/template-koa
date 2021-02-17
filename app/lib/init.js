@@ -46,10 +46,9 @@ class Init {
   /**
    * 加载配置
    * @api private
-   * @param {string} [filePath=''] 配置文件路径
    * @returns {Object} 配置的数据对象
    */
-  static loadConfig(filePath = '') {
+  static loadConfig() {
     const pathConfig = config.path
 
     pathConfig.root = path.join(process.cwd(), pathConfig.root)
@@ -61,8 +60,11 @@ class Init {
       }
     }
 
-    const normalized = path.normalize(filePath || pathConfig.config)
-    return require(normalized)
+    const allConfig = require(pathConfig.config)
+
+    allConfig.path = pathConfig
+
+    return allConfig
   }
 
   /**
