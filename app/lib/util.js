@@ -68,8 +68,32 @@ function success(param) {
   throw new __ERROR__.Success(succInfo)
 }
 
+/**
+ * 处理数据，返回数据和分页信息
+ * @param {Array} [data=[]]   - 数据
+ * @param {number} [start=0]  - 开始索引
+ * @param {number} [count=20] - 一页数量
+ * @returns {Object}
+ */
+function pagination(data = [], start = 0, count = 20) {
+  const subData = data.slice(start, start + count)
+  const totalCount = subData.length || 0
+  const totalPage = Math.ceil(totalCount / count)
+
+  const result = {
+    data: subData,
+    // 数据总量
+    totalCount,
+    // 总页数
+    totalPage,
+  }
+
+  return result
+}
+
 module.exports = {
   readFile,
   genToken,
   success,
+  pagination,
 }

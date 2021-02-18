@@ -17,8 +17,20 @@ class NotEmptyValidator extends LinValidator {
 class PaginationValidator extends LinValidator {
   constructor() {
     super()
-    this.currPage = [new Rule('isInt', '需要是正整数', { min: 1 })]
-    this.pageSize = [new Rule('isInt', '需要是正整数', { min: 1 })]
+    this.start = [
+      new Rule('isOptional'),
+      new Rule('isInt', '不符合规范', {
+        min: 0,
+        max: Number.MAX_SAFE_INTEGER,
+      }),
+    ]
+    this.count = [
+      new Rule('isOptional'),
+      new Rule('isInt', '不符合规范', {
+        min: 0,
+        max: 20,
+      }),
+    ]
   }
 }
 
