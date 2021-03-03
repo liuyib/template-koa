@@ -75,6 +75,13 @@ Model.prototype.toJSON = function () {
     }
   }
 
+  // 触发 Model 上的 getter（如果直接用 dataValues，则定义的 getter 无法生效）
+  for (const key in data) {
+    if (Object.hasOwnProperty.call(data, key) && this[key] != null) {
+      data[key] = this[key]
+    }
+  }
+
   return data
 }
 
