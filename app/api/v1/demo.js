@@ -9,11 +9,11 @@ const { success } = require('~lib/util')
  */
 router.get('/test', async (ctx) => {
   success({
-    msg: '请求成功',
     data: {
       'demo1-1': '见：/v1/demo/test/include',
       'demo1-2': '见：/v1/demo/test/exclude',
     },
+    msg: '请求成功',
   })
 })
 
@@ -25,7 +25,10 @@ router.get('/test/include', async (ctx) => {
 
   demo.include = ['foo', 'bar']
 
-  success({ msg: '', data: demo })
+  success({
+    data: demo,
+    msg: '请求成功',
+  })
 })
 
 /**
@@ -36,14 +39,19 @@ router.get('/test/exclude', async (ctx) => {
 
   demo.exclude = ['created_at', 'updated_at', 'deleted_at']
 
-  success({ msg: '', data: demo })
+  success({
+    data: demo,
+    msg: '请求成功',
+  })
 })
 
 /**
  * Demo 测试接口（需要权限）
  */
 router.get('/auth', new Auth(__AUTH__.USER).verify, async (ctx) => {
-  success({ msg: '请求成功' })
+  success({
+    msg: '请求成功',
+  })
 })
 
 module.exports = router

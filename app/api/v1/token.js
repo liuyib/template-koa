@@ -13,7 +13,10 @@ router.post('/', async (ctx) => {
   // v.get('body') <=> ctx.request.body
   const token = await Token.getData(v.get('body'))
 
-  success({ msg: 'token 获取成功', data: token })
+  success({
+    data: token,
+    msg: 'token 获取成功',
+  })
 })
 
 /**
@@ -26,7 +29,9 @@ router.post('/verify', async (ctx) => {
   const isTokenValid = Auth.verifyToken(v.get('body.token'))
 
   if (isTokenValid) {
-    success({ msg: 'token 合法' })
+    success({
+      msg: 'token 合法',
+    })
   } else {
     throw new __ERROR__.ParamException('token 不合法')
   }

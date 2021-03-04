@@ -12,7 +12,9 @@ router.post('/signup', async (ctx) => {
   const v = await new SignupValidator().validate(ctx)
 
   await User.setData(v.get('body'))
-  success({ msg: '注册成功' })
+  success({
+    msg: '注册成功',
+  })
 })
 
 /**
@@ -23,7 +25,10 @@ router.post('/login', async (ctx) => {
   // 登录成功后，颁发 token
   const token = await Token.getData(v.get('body'))
 
-  success({ msg: '登录成功', data: token })
+  success({
+    data: token,
+    msg: '登录成功',
+  })
 })
 
 module.exports = router
