@@ -4,6 +4,7 @@
   "description": "A template repo for KOA",
   "main": "index.js",
   "scripts": {
+    "preinstall": "npm list link-module-alias && link-module-alias clean || true",
     "postinstall": "link-module-alias",
     "dev": "cross-env NODE_ENV=development node index.js",
     "dev:watch": "cross-env NODE_ENV=development nodemon index.js",
@@ -26,7 +27,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "basic-auth": "^2.0.1",
-    "bcrypt": "^5.0.0",
+    "bcryptjs": "^2.4.3",
     "dotenv": "^8.2.0",
     "jsonwebtoken": "^8.5.1",
     "koa": "^2.13.1",
