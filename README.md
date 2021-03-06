@@ -1,4 +1,6 @@
-# koa-study
+# koa-template
+
+Koa 框架的二次封装
 
 ## 准备工作
 
