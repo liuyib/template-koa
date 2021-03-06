@@ -2,11 +2,7 @@
  * Http 错误信息基类
  */
 class HttpException extends Error {
-  constructor(
-    msg = '自定义错误',
-    code = __CODE__.HTTP_EXCEPTION,
-    status = 400,
-  ) {
+  constructor(msg = '自定义错误', code = __CODE__.HTTP_ERROR, status = 400) {
     super()
     this.msg = msg
     this.code = code
@@ -18,7 +14,7 @@ class HttpException extends Error {
  * 参数错误类
  */
 class ParamException extends HttpException {
-  constructor(msg = '参数错误', code = __CODE__.PARAM_EXCEPTION) {
+  constructor(msg = '参数错误', code = __CODE__.PARAM_ERROR) {
     super(msg, code, 400)
   }
 }
