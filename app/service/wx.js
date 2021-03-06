@@ -4,8 +4,6 @@ const { User } = require('~model/user')
 const { genToken } = require('~lib/util')
 
 class WXManager {
-  constructor() {}
-
   /**
    * 通过微信登录（wx.login）时返回的 code，来获取微信用户 openid，
    * 并用“openid”和“用户权限标识”生成 JWT，返回给客户端
@@ -20,11 +18,11 @@ class WXManager {
       const { data } = await axios.get(url)
 
       if (data.errcode && data.errcode !== 0) {
-        throw `openid 获取失败，[${data.errcode}] ${data.errmsg}`
+        throw new Error(`openid 获取失败，[${data.errcode}] ${data.errmsg}`)
       }
 
       const { openid } = data
-      const user = await User.getData({ openid })
+      let user = await User.getData({ openid })
 
       if (!user) {
         user = await User.setData({ openid })

@@ -24,13 +24,12 @@ class Init {
    * @returns
    */
   static loadGlobalVar() {
-    /* prettier-ignore */
     Object.assign(global, {
-      __DEV__   : this.loadEnvDev(),
+      __DEV__: this.loadEnvDev(),
       __CONFIG__: this.loadConfig(),
-      __ERROR__ : this.loadException(),
-      __AUTH__  : this.loadAuth(),
-      __CODE__  : this.loadHttpCode(),
+      __ERROR__: this.loadException(),
+      __AUTH__: this.loadAuth(),
+      __CODE__: this.loadHttpCode(),
     })
   }
 

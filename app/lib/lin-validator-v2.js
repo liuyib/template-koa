@@ -20,8 +20,10 @@ const { get, last, set, cloneDeep } = require('lodash')
 const findMembers = function (instance, { prefix, specifiedType, filter }) {
   // 递归函数
   function step(instance) {
-    //基线条件（跳出递归）
-    if (instance.__proto__ === null) return []
+    const _prototype = Object.getPrototypeOf(instance)
+
+    // 基线条件（跳出递归）
+    if (_prototype === null) return []
 
     let names = Reflect.ownKeys(instance)
 
@@ -30,7 +32,7 @@ const findMembers = function (instance, { prefix, specifiedType, filter }) {
       return shouldKeep(name)
     })
 
-    return [...names, ...step(instance.__proto__)]
+    return [...names, ...step(_prototype)]
   }
 
   function shouldKeep(value) {
@@ -90,7 +92,7 @@ class LinValidator {
 
   async validate(ctx, alias = {}) {
     this.alias = alias
-    let params = this._assembleAllParams(ctx)
+    const params = this._assembleAllParams(ctx)
     this.data = cloneDeep(params)
     this.parsed = cloneDeep(params)
 
@@ -100,13 +102,13 @@ class LinValidator {
 
     const errorMsgs = []
     // const map = new Map(memberKeys)
-    for (let key of memberKeys) {
+    for (const key of memberKeys) {
       const result = await this._check(key, alias)
       if (!result.success) {
         errorMsgs.push(result.msg)
       }
     }
-    if (errorMsgs.length != 0) {
+    if (errorMsgs.length !== 0) {
       throw new ParamException(errorMsgs)
     }
     ctx.v = this
@@ -114,7 +116,7 @@ class LinValidator {
   }
 
   async _check(key, alias = {}) {
-    const isCustomFunc = typeof this[key] == 'function' ? true : false
+    const isCustomFunc = typeof this[key] === 'function'
     let result
     if (isCustomFunc) {
       try {
@@ -136,7 +138,7 @@ class LinValidator {
 
       if (result.pass) {
         // 如果参数路径不存在，往往是因为用户传了空值，而又设置了默认值
-        if (param.path.length == 0) {
+        if (param.path.length === 0) {
           set(this.parsed, ['default', key], result.legalValue)
         } else {
           set(this.parsed, param.path, result.legalValue)
@@ -219,7 +221,7 @@ class Rule {
   }
 
   validate(field) {
-    if (this.name == 'isOptional') return new RuleResult(true)
+    if (this.name === 'isOptional') return new RuleResult(true)
     if (!validator[this.name](field + '', ...this.params)) {
       return new RuleResult(false, this.msg || this.message || '参数错误')
     }
@@ -245,8 +247,8 @@ class RuleField {
     }
 
     const filedResult = new RuleFieldResult(false)
-    for (let rule of this.rules) {
-      let result = rule.validate(field)
+    for (const rule of this.rules) {
+      const result = rule.validate(field)
       if (!result.pass) {
         filedResult.msg = result.msg
         filedResult.legalValue = null
@@ -258,23 +260,23 @@ class RuleField {
   }
 
   _convert(value) {
-    for (let rule of this.rules) {
-      if (rule.name == 'isInt') {
+    for (const rule of this.rules) {
+      if (rule.name === 'isInt') {
         return parseInt(value)
       }
-      if (rule.name == 'isFloat') {
+      if (rule.name === 'isFloat') {
         return parseFloat(value)
       }
-      if (rule.name == 'isBoolean') {
-        return value ? true : false
+      if (rule.name === 'isBoolean') {
+        return !!value
       }
     }
     return value
   }
 
   _allowEmpty() {
-    for (let rule of this.rules) {
-      if (rule.name == 'isOptional') {
+    for (const rule of this.rules) {
+      if (rule.name === 'isOptional') {
         return true
       }
     }
@@ -282,9 +284,9 @@ class RuleField {
   }
 
   _hasDefault() {
-    for (let rule of this.rules) {
+    for (const rule of this.rules) {
       const defaultValue = rule.params[0]
-      if (rule.name == 'isOptional') {
+      if (rule.name === 'isOptional') {
         return defaultValue
       }
     }
