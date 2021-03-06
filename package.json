@@ -4,9 +4,19 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "prepare": "husky install",
+    "pre-commit": "lint-staged",
     "dev": "cross-env NODE_ENV=development node index.js",
     "dev:watch": "cross-env NODE_ENV=development nodemon index.js",
-    "prettier": "prettier --write app/**/**/*.js"
+    "lint": "eslint app/**/*.js",
+    "lint:fix": "eslint --fix app/**/*.js",
+    "style": "prettier --write app/**/*.js"
+  },
+  "lint-staged": {
+    "app/**/*.js": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   },
   "repository": {
     "type": "git",
@@ -38,6 +48,15 @@
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
+    "eslint": "^7.21.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^3.3.1",
+    "eslint-plugin-promise": "^4.3.1",
+    "husky": "^5.1.3",
+    "lint-staged": "^10.5.4",
     "nodemon": "^2.0.7",
     "prettier": "^2.2.1"
   },
