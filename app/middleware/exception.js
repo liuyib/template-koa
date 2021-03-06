@@ -34,7 +34,7 @@ const catchError = () => {
       } else {
         ctx.body = {
           msg: '服务端出错啦',
-          code: 10500,
+          code: __CODE__.SERVER_ERROR,
           request: `${ctx.method} ${ctx.path}`,
         }
         ctx.status = 500

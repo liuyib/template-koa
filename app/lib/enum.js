@@ -58,6 +58,8 @@ const HTTP_CODE = {
   FORBBIDEN: 10403,
   // 授权失败
   AUTH_FAILED: 10401,
+  // 服务器错误
+  SERVER_ERROR: 10500,
   // 点赞失败
   LIKE_EXCEPTION: 60001,
   // 取消点赞失败
