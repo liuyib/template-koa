@@ -26,18 +26,20 @@ class User extends Model {
 
   /**
    * 验证邮箱和密码
-   * @param {string} email    - 邮箱
-   * @param {string} password - 密码
+   * @param {string} email  - 邮箱
+   * @param {string} secret - 密码
    * @returns {Object} User 模型的实例
    */
-  static async verifyEmailPwd(email, password) {
-    const user = await User.getData({ email })
+  static async verifyEmailSecret(email, secret) {
+    const user = await User.getData({
+      account: email,
+    })
 
     if (!user) {
       throw new __ERROR__.AuthFailed('邮箱不存在')
     }
 
-    const isPwdCorrect = bcrypt.compareSync(password, user.password)
+    const isPwdCorrect = bcrypt.compareSync(secret, user.secret)
 
     if (!isPwdCorrect) {
       throw new __ERROR__.AuthFailed('密码不正确')
@@ -54,16 +56,12 @@ User.init(
       primaryKey: true,
       autoIncrement: true,
     },
-    nickname: {
-      type: DataTypes.STRING,
-      comment: '昵称',
-    },
-    email: {
+    account: {
       type: DataTypes.STRING,
       unique: true,
-      comment: '邮箱',
+      comment: '账号（邮箱、手机号、等）',
     },
-    password: {
+    secret: {
       type: DataTypes.STRING,
       comment: '密码',
       /**
@@ -72,9 +70,13 @@ User.init(
        */
       set(val) {
         const salt = bcrypt.genSaltSync(10)
-        const pwd = bcrypt.hashSync(val, salt)
-        this.setDataValue('password', pwd)
+        const secret = bcrypt.hashSync(val, salt)
+        this.setDataValue('secret', secret)
       },
+    },
+    nickname: {
+      type: DataTypes.STRING,
+      comment: '昵称',
     },
     openid: {
       type: DataTypes.STRING(64),
