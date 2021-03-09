@@ -50,7 +50,7 @@ class Token {
  */
 async function userEmailLogin(account, secret) {
   // 把接口验证逻辑分离到 Model 层
-  const user = await User.verifyEmailPwd(account, secret)
+  const user = await User.verifyEmailSecret(account, secret)
   const token = genToken(user.id, __AUTH__.USER)
   return token
 }

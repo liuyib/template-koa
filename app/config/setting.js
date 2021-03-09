@@ -10,4 +10,13 @@ module.exports = {
     // 路由文件
     api: '/app/api',
   },
+  // 验证相关
+  validate: {
+    // 手机号验证
+    mobilePhone: {
+      // 验证手机号码时，允许验证的地区列表（默认中国大陆）
+      // 详见：https://github.com/validatorjs/validator.js -> isMobilePhone
+      locales: ['zh-CN'],
+    },
+  },
 }
