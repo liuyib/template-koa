@@ -25,24 +25,25 @@ class User extends Model {
   }
 
   /**
-   * 验证邮箱和密码
-   * @param {string} email  - 邮箱
-   * @param {string} secret - 密码
+   * 验证账号和密码
+   * @param {string} account - 账号
+   * @param {string} secret  - 密码
    * @returns {Object} User 模型的实例
    */
-  static async verifyEmailSecret(email, secret) {
-    const user = await User.getData({
-      account: email,
-    })
+  static async verifyAccountSecret(account, secret) {
+    const user = await User.getData({ account })
+    let isVerifyPass = false
 
-    if (!user) {
-      throw new __ERROR__.AuthFailed('邮箱不存在')
+    if (user) {
+      const isSecretValid = bcrypt.compareSync(secret, user.secret)
+
+      if (isSecretValid) {
+        isVerifyPass = true
+      }
     }
 
-    const isPwdCorrect = bcrypt.compareSync(secret, user.secret)
-
-    if (!isPwdCorrect) {
-      throw new __ERROR__.AuthFailed('密码不正确')
+    if (!isVerifyPass) {
+      throw new __ERROR__.AuthFailed('账号或密码不正确')
     }
 
     return user

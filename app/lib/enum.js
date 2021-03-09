@@ -17,14 +17,12 @@ function isType(val) {
  * 登录类型
  */
 const LOGIN_TYPE = {
-  // 用户   - 小程序
-  USER_MINI_PROGRAM: 100,
-  // 用户   - 邮箱
-  USER_EMAIL: 101,
-  // 用户   - 手机号
-  USER_MOBILE: 102,
-  // 管理员 - 邮箱
-  ADMIN_EMAIL: 200,
+  // 小程序登录
+  MINI_PROGRAM: 100,
+  // 账号 + 密码登录（账号可以是：邮箱、手机号）
+  ACCOUNT: 101,
+  // 手机号 + 验证码登录
+  MOBILE_PHONE: 102,
   isType,
 }
 

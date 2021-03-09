@@ -20,18 +20,15 @@ class Token {
     let token = ''
 
     switch (tokenType) {
-      case LOGIN_TYPE.USER_EMAIL:
-        token = await userEmailLogin(account, secret)
+      case LOGIN_TYPE.ACCOUNT:
+        token = await userAccountLogin(account, secret)
         break
       // TODO
-      // case LOGIN_TYPE.USER_MOBILE:
+      // case LOGIN_TYPE.MOBILE_PHONE:
       //   break
-      case LOGIN_TYPE.USER_MINI_PROGRAM:
+      case LOGIN_TYPE.MINI_PROGRAM:
         token = await userMinipgmLogin(account)
         break
-      // TODO
-      // case LOGIN_TYPE.ADMIN_EMAIL:
-      //   break
       default:
         throw new __ERROR__.ParamException(
           `未定义 type: ${tokenType} 的处理函数`,
@@ -43,14 +40,14 @@ class Token {
 }
 
 /**
- * 用户通过邮箱登录
- * @param {string} account - 账户
+ * 用户通过账号密码登录
+ * @param {string} account - 账号
  * @param {string} secret  - 密码
  * @returns {string} 颁发的 JWT
  */
-async function userEmailLogin(account, secret) {
+async function userAccountLogin(account, secret) {
   // 把接口验证逻辑分离到 Model 层
-  const user = await User.verifyEmailSecret(account, secret)
+  const user = await User.verifyAccountSecret(account, secret)
   const token = genToken(user.id, __AUTH__.USER)
   return token
 }
