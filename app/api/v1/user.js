@@ -10,8 +10,8 @@ const { success } = require('~lib/util')
  */
 router.post('/signup', async (ctx) => {
   const v = await new SignupValidator().validate(ctx)
-
   await User.setData(v.get('body'))
+
   success({
     msg: '注册成功',
   })

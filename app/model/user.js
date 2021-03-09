@@ -17,11 +17,16 @@ class User extends Model {
 
   /**
    * 插入数据
-   * @param {Object} info - 要插入的数据
+   * @param {Object} param
+   * @param {string} param.account  - 账号
+   * @param {string} [param.secret] - 密码
    * @returns {Object} User 模型的实例
    */
-  static async setData(info) {
-    return await User.create(info)
+  static async setData({ account, secret = '' }) {
+    return await User.create({
+      account,
+      secret,
+    })
   }
 
   /**
@@ -70,6 +75,8 @@ User.init(
        * 当 /signup 接口中设置数据时，就会执行这里的操作
        */
       set(val) {
+        if (!val) return
+
         const salt = bcrypt.genSaltSync(10)
         const secret = bcrypt.hashSync(val, salt)
         this.setDataValue('secret', secret)

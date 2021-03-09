@@ -3,11 +3,16 @@ const { LinValidator, Rule } = require('~lib/lin-validator-v2')
 const { LOGIN_TYPE } = require('~lib/enum')
 const { User } = require('~model/user')
 
-class SignupValidator extends LinValidator {
+class AuthValidator extends LinValidator {
   constructor() {
     super()
+    this.type = [
+      new Rule('isLength', '不能为空', { min: 1 }),
+      new Rule('isIn', '不合法的登录类型', Object.values(LOGIN_TYPE)),
+    ]
     this.account = [new Rule('isLength', '账号不能为空', { min: 1 })]
     this.secret = [
+      new Rule('isOptional'),
       new Rule('isLength', '密码长度必须 6~32 个字符', { min: 6, max: 32 }),
       new Rule(
         'matches',
@@ -15,57 +20,76 @@ class SignupValidator extends LinValidator {
         /^\S*(?=\S{6,})(?=\S*\d)(?=\S*[A-Z])(?=\S*[a-z])(?=\S*[!@#$%.])\S*$/,
       ),
     ]
-    this.nickname = [
-      new Rule('isLength', '昵称长度必须 2~32 个字符', { min: 2, max: 32 }),
+    // 验证码（verification code => vcode）
+    this.vcode = [
+      new Rule('isOptional'),
+      new Rule('isLength', '验证码不能为空', { min: 1 }),
+      new Rule('isNumeric', '验证码只允许是数字', { no_symbols: true }),
     ]
   }
 
-  async validateAccount(req) {
-    const { account } = req.body
+  _isAccountType(type) {
+    return type === LOGIN_TYPE.ACCOUNT
+  }
 
-    if (!account) return
+  _isMobilePhoneType(type) {
+    return type === LOGIN_TYPE.MOBILE_PHONE
+  }
 
+  _isEmail(val) {
+    return validator.isEmail(val)
+  }
+
+  _isPhone(val) {
     const { locales } = __CONFIG__.validate.mobilePhone
-    const isEmail = validator.isEmail(account)
-    const isMobilePhone = validator.isMobilePhone(account, locales)
 
-    if (!isEmail && !isMobilePhone) {
-      throw new Error('请输入正确的邮箱或手机号')
+    return validator.isMobilePhone(val, locales)
+  }
+}
+
+class SignupValidator extends AuthValidator {
+  async validateAccount(req) {
+    const { type, account } = req.body
+
+    if (!type || !account) return
+
+    if (this._isAccountType(type)) {
+      if (!this._isEmail(account)) {
+        throw new Error('请输入正确的邮箱')
+      }
+    } else if (this._isMobilePhoneType(type)) {
+      if (!this._isPhone(account)) {
+        throw new Error('请输入正确的手机号')
+      }
     }
 
-    const ret = await User.getData({ account })
+    const user = await User.getData({ account })
 
-    if (ret) {
-      if (isEmail) {
-        throw new Error('该 Email 已经注册')
-      } else if (isMobilePhone) {
+    if (user) {
+      if (this._isAccountType(type)) {
+        throw new Error('该邮箱已经注册')
+      } else if (this._isMobilePhoneType(type)) {
         throw new Error('该手机号已经注册')
       }
     }
   }
-
-  validateSecret(req) {
-    const { secret, secret2 } = req.body
-
-    if (secret !== secret2) {
-      throw new Error('两次输入的密码不相同')
-    }
-  }
 }
 
-class LoginValidator extends LinValidator {
-  constructor() {
-    super()
-    this.type = [
-      new Rule('isIn', '不合法的登录类型', Object.values(LOGIN_TYPE)),
-    ]
-    this.account = [new Rule('isOptional')]
-    this.secret = [
-      new Rule('isOptional'),
-      new Rule('isLength', '密码至少六位', {
-        min: 6,
-      }),
-    ]
+class LoginValidator extends AuthValidator {
+  validateAccount(req) {
+    const { type, account } = req.body
+
+    if (!type || !account) return
+
+    if (this._isAccountType(type)) {
+      if (!this._isPhone(account) && !this._isEmail(account)) {
+        throw new Error('请输入正确的手机号或邮箱')
+      }
+    } else if (this._isMobilePhoneType(type)) {
+      if (!this._isPhone(account)) {
+        throw new Error('请输入正确的手机号')
+      }
+    }
   }
 }
 
