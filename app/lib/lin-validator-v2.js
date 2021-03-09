@@ -1,9 +1,3 @@
-/**
- * Lin-Validator v2
- * 作者：7七月
- * 微信公众号：林间有风
- */
-
 const validator = require('validator')
 const { ParamException } = require('./http-exception')
 const { get, last, set, cloneDeep } = require('lodash')
@@ -159,35 +153,20 @@ class LinValidator {
   }
 
   _findParam(key) {
+    const params = ['query', 'body', 'path', 'header']
     let value
-    value = get(this.data, ['query', key])
-    if (value) {
-      return {
-        value,
-        path: ['query', key],
+
+    for (const param of params) {
+      value = get(this.data, [param, key])
+
+      if (value !== null && value !== undefined) {
+        return {
+          value,
+          path: ['query', key],
+        }
       }
     }
-    value = get(this.data, ['body', key])
-    if (value) {
-      return {
-        value,
-        path: ['body', key],
-      }
-    }
-    value = get(this.data, ['path', key])
-    if (value) {
-      return {
-        value,
-        path: ['path', key],
-      }
-    }
-    value = get(this.data, ['header', key])
-    if (value) {
-      return {
-        value,
-        path: ['header', key],
-      }
-    }
+
     return {
       value: null,
       path: [],
