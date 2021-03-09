@@ -15,3 +15,5 @@ Koa 框架的二次封装
   DB_USER=root
   DB_PASS=123456
   ```
+
+- 根据你在 `.env` 文件中填写的信息，新建 MySQL 数据库。一般来说，新建数据库时，字符集（Character set）选择：`utf8mb4`，字符序（Collation，影响数据库查询时字符的**比较**和**排序**）选择：`utf8mb4_general_ci`。
