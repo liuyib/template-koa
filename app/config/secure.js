@@ -39,4 +39,15 @@ module.exports = {
     // 生成 uid 的长度
     uidLength: 13,
   },
+  // session 相关。详见：https://github.com/koajs/session
+  session: {
+    // 用于给 Cookie 签名
+    keys: ['ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()'],
+    options: {
+      // 生成 Cookie 的 key
+      key: 'user_session',
+      // 过期时间十分钟（单位 ms）
+      maxAge: 1000 * 60 * 10,
+    },
+  },
 }
