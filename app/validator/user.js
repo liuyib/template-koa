@@ -10,7 +10,20 @@ class AuthValidator extends LinValidator {
       new Rule('isLength', '不能为空', { min: 1 }),
       new Rule('isIn', '不合法的登录类型', Object.values(LOGIN_TYPE)),
     ]
-    this.account = [new Rule('isLength', '账号不能为空', { min: 1 })]
+    this.telephone = [
+      new Rule('isOptional'),
+      new Rule('isLength', '手机号不能为空', { min: 1 }),
+      new Rule('isMobilePhone', '手机号不合法'),
+    ]
+    this.email = [
+      new Rule('isOptional'),
+      new Rule('isLength', '邮箱不能为空', { min: 1 }),
+      new Rule('isEmail', '邮箱不合法'),
+    ]
+    this.account = [
+      new Rule('isOptional'),
+      new Rule('isLength', '账号不能为空', { min: 1 }),
+    ]
     this.secret = [
       new Rule('isOptional'),
       new Rule('isLength', '密码长度必须 6~32 个字符', { min: 6, max: 32 }),

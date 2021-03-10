@@ -3,7 +3,7 @@ const util = require('util')
 const { User } = require('~model/user')
 const { genToken } = require('~lib/util')
 
-class WXManager {
+class WXService {
   /**
    * 通过微信登录（wx.login）时返回的 code，来获取微信用户 openid，
    * 并用“openid”和“用户权限标识”生成 JWT，返回给客户端
@@ -36,5 +36,5 @@ class WXManager {
 }
 
 module.exports = {
-  WXManager,
+  WXService,
 }

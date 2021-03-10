@@ -1,7 +1,7 @@
 const { LOGIN_TYPE } = require('~lib/enum')
 const { genToken } = require('~lib/util')
 const { User } = require('~model/user')
-const { WXManager } = require('~service/wx')
+const { WXService } = require('~service/wx')
 
 /**
  * 抽象类 Token（用于统一处理 Token 相关的逻辑，保持接口文件中代码的简洁）
@@ -59,7 +59,7 @@ async function userAccountLogin(account, secret) {
  */
 async function userMinipgmLogin(account) {
   // 把接口验证逻辑分离到 Service 中（也是 Model 层）
-  return await WXManager.code2Token(account)
+  return await WXService.code2Token(account)
 }
 
 module.exports = {

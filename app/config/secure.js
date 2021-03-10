@@ -32,4 +32,11 @@ module.exports = {
     loginUrl:
       'https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_codeF',
   },
+  // 随机账号生成（前缀 + uid）。用户注册时，会自动生成一个随机账号，可用于登录。
+  account: {
+    // 前缀
+    prefix: '_',
+    // 生成 uid 的长度
+    uidLength: 13,
+  },
 }

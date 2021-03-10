@@ -1,9 +1,11 @@
 const bcrypt = require('bcryptjs')
+const { uid } = require('uid/secure')
 const { Model, DataTypes } = require('sequelize')
 const { sequelize } = require('~lib/db')
+const { LOGIN_TYPE } = require('~lib/enum')
 
 /**
- * 实体表 User
+ * 用户表（实体表）
  */
 class User extends Model {
   /**
@@ -22,7 +24,20 @@ class User extends Model {
    * @param {string} [param.secret] - 密码
    * @returns {Object} User 模型的实例
    */
-  static async setData({ account, secret = '' }) {
+  static async setData({ type, account, secret = '' }) {
+    const _type = parseInt(type, 10)
+
+    switch (_type) {
+      case LOGIN_TYPE.ACCOUNT:
+        break
+      case LOGIN_TYPE.MOBILE_PHONE:
+        break
+      case LOGIN_TYPE.MINI_PROGRAM:
+        break
+      default:
+        throw new __ERROR__.ParamException(`未定义 type: ${_type} 的处理函数`)
+    }
+
     return await User.create({
       account,
       secret,
@@ -65,15 +80,18 @@ User.init(
     account: {
       type: DataTypes.STRING,
       unique: true,
-      comment: '账号（邮箱、手机号、等）',
+      comment: '账号（通过 uid 生成）',
+      set(val) {
+        if (!val) return
+
+        const { prefix, uidLength } = __CONFIG__.account
+        const genRandomAccount = `${prefix}${uid(uidLength)}`
+        this.setDataValue('account', genRandomAccount)
+      },
     },
     secret: {
       type: DataTypes.STRING,
       comment: '密码',
-      /**
-       * 观察者模式
-       * 当 /signup 接口中设置数据时，就会执行这里的操作
-       */
       set(val) {
         if (!val) return
 
@@ -81,6 +99,14 @@ User.init(
         const secret = bcrypt.hashSync(val, salt)
         this.setDataValue('secret', secret)
       },
+    },
+    telephone: {
+      type: DataTypes.STRING,
+      comment: '手机号',
+    },
+    email: {
+      type: DataTypes.STRING,
+      comment: '邮箱',
     },
     nickname: {
       type: DataTypes.STRING,
