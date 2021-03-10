@@ -10,7 +10,6 @@ const { success } = require('~lib/util')
  */
 router.post('/', async (ctx) => {
   const v = await new TokenValidator().validate(ctx)
-  // v.get('body') <=> ctx.request.body
   const token = await Token.getData(v.get('body'))
 
   success({

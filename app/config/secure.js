@@ -1,6 +1,7 @@
 const { env } = process
 
 module.exports = {
+  // 数据库相关
   db: {
     dialect: 'mariadb',
     name: env.DB_NAME,
@@ -13,13 +14,21 @@ module.exports = {
     logging: false,
     timezone: '+08:00',
   },
+  // JWT 相关
   jwt: {
+    // 可以任意随机字符串（长度适当，不要过长或过短）
     secretKey: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()',
+    // JWT 过期时间
     expiresIn: 60 * 60,
   },
+  // 微信相关
   wx: {
+    // 小程序开发者 ID
     appId: env.WX_APP_ID,
+    // 小程序开发者密钥
     appSecret: env.WX_APP_SECRET,
+    // 获取用户唯一标识 OpenID、用户在微信开放平台帐号下的唯一标识 UnionID（若当前小程序已绑定到微信开放平台帐号）和 会话密钥 session_key
+    // 详见：https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/login.html
     loginUrl:
       'https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_codeF',
   },
