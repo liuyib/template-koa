@@ -192,9 +192,10 @@ class RuleResult {
   }
 }
 
-class RuleFieldResult extends RuleResult {
+class RuleFieldResult {
   constructor({ pass = false, msg = '', legalValue = null, isReturn = false }) {
-    super(pass, msg)
+    this.pass = pass
+    this.msg = msg
     this.legalValue = legalValue
     this.isReturn = isReturn
   }
