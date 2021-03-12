@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs')
 const { uid } = require('uid/secure')
-const { Model, DataTypes } = require('sequelize')
+const { Model, DataTypes, Op } = require('sequelize')
 const { sequelize } = require('~lib/db')
 const { LOGIN_TYPE } = require('~lib/enum')
 const { EmailService } = require('~service/email')
@@ -115,7 +115,9 @@ class User extends Model {
    * @returns {Object} User 模型的实例
    */
   static async verifyAccountSecret(account, secret) {
-    const user = await User.getData({ account })
+    const user = await User.getData({
+      [Op.or]: [{ email: account }, { telephone: account }],
+    })
     let isVerifyPass = false
 
     if (user) {
