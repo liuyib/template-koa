@@ -119,9 +119,12 @@ class LinValidator {
     if (isCustomFunc) {
       try {
         await this[key](this.data)
-        result = new RuleResult(true)
+        result = new RuleResult({ pass: true })
       } catch (error) {
-        result = new RuleResult(false, error.msg || error.message || '参数错误')
+        result = new RuleResult({
+          pass: false,
+          msg: error.msg || error.message || '参数错误',
+        })
       }
       // 函数验证
     } else {
@@ -180,18 +183,20 @@ class LinValidator {
 }
 
 class RuleResult {
-  constructor(pass, msg = '') {
+  constructor({ pass = false, msg = '', isReturn = false }) {
     Object.assign(this, {
       pass,
       msg,
+      isReturn,
     })
   }
 }
 
 class RuleFieldResult extends RuleResult {
-  constructor(pass, msg = '', legalValue = null) {
+  constructor({ pass = false, msg = '', legalValue = null, isReturn = false }) {
     super(pass, msg)
     this.legalValue = legalValue
+    this.isReturn = isReturn
   }
 }
 
@@ -205,11 +210,19 @@ class Rule {
   }
 
   validate(field) {
-    if (this.name === 'isOptional') return new RuleResult(true)
-    if (!validator[this.name](field + '', ...this.params)) {
-      return new RuleResult(false, this.msg || this.message || '参数错误')
+    if (this.name === 'isReturn') {
+      return new RuleResult({ pass: true, isReturn: true })
     }
-    return new RuleResult(true, '')
+    if (this.name === 'isOptional') {
+      return new RuleResult({ pass: true })
+    }
+    if (!validator[this.name](field + '', ...this.params)) {
+      return new RuleResult({
+        pass: false,
+        msg: this.msg || this.message || '参数错误',
+      })
+    }
+    return new RuleResult({ pass: true })
   }
 }
 
@@ -221,27 +234,46 @@ class RuleField {
   validate(field) {
     if (field == null) {
       // 如果字段为空
-      const allowEmpty = this._allowEmpty()
-      const defaultValue = this._hasDefault()
-      if (allowEmpty) {
-        return new RuleFieldResult(true, '', defaultValue)
-      } else {
-        return new RuleFieldResult(false, '字段是必填参数')
+      const detect = this._detectEmpty()
+
+      if (detect.isOptional) {
+        return new RuleFieldResult({
+          pass: true,
+          legalValue: detect.default,
+        })
       }
+
+      return new RuleFieldResult({
+        pass: false,
+        msg: '字段是必填参数',
+        isReturn: detect.isReturn,
+      })
     }
 
-    const filedResult = new RuleFieldResult(false)
+    const filedResult = new RuleFieldResult({ pass: false })
+
     for (const rule of this.rules) {
       const result = rule.validate(field)
+
+      if (result.isReturn) {
+        filedResult.isReturn = true
+      }
       if (!result.pass) {
         filedResult.msg = result.msg
         filedResult.legalValue = null
-        filedResult.isReturn = rule.params[1] === true
+
+        if (rule.params[1]) {
+          filedResult.isReturn = rule.params[1] === true
+        }
         // 一旦一条校验规则不通过，则立即终止这个字段的验证
         return filedResult
       }
     }
-    return new RuleFieldResult(true, '', this._convert(field))
+
+    return new RuleFieldResult({
+      pass: true,
+      legalValue: this._convert(field),
+    })
   }
 
   _convert(value) {
@@ -259,22 +291,26 @@ class RuleField {
     return value
   }
 
-  _allowEmpty() {
-    for (const rule of this.rules) {
-      if (rule.name === 'isOptional') {
-        return true
-      }
+  _detectEmpty() {
+    const info = {
+      default: '',
+      isOptional: false,
+      isReturn: false,
     }
-    return false
-  }
 
-  _hasDefault() {
     for (const rule of this.rules) {
       const defaultValue = rule.params[0]
+
       if (rule.name === 'isOptional') {
-        return defaultValue
+        info.default = defaultValue
+        info.isOptional = true
+      }
+      if (rule.name === 'isReturn') {
+        info.isReturn = true
       }
     }
+
+    return info
   }
 }
 
