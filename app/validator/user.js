@@ -1,5 +1,6 @@
 const validator = require('validator')
 const { LinValidator, Rule } = require('~lib/lin-validator-v2')
+const { isEmpty } = require('~lib/util')
 const { LOGIN_TYPE } = require('~lib/enum')
 const { User } = require('~model/user')
 
@@ -7,6 +8,7 @@ class AuthValidator extends LinValidator {
   constructor() {
     super()
     this.type = [
+      new Rule('isReturn'),
       new Rule('isLength', '不能为空', { min: 1 }),
       new Rule('isIn', '不合法的登录类型', Object.values(LOGIN_TYPE)),
     ]
@@ -35,25 +37,26 @@ class AuthValidator extends LinValidator {
     ]
     // 验证码（verification code => vcode）
     this.vcode = [
+      new Rule('isReturn'),
       new Rule('isOptional'),
       new Rule('isLength', '验证码不能为空', { min: 1 }),
       new Rule('isNumeric', '验证码只允许是数字', { no_symbols: true }),
     ]
   }
 
-  _isAccountType(type) {
+  isAccountType(type) {
     return type === LOGIN_TYPE.ACCOUNT
   }
 
-  _isMobilePhoneType(type) {
+  isMobilePhoneType(type) {
     return type === LOGIN_TYPE.MOBILE_PHONE
   }
 
-  _isEmail(val) {
+  isEmail(val) {
     return validator.isEmail(val)
   }
 
-  _isPhone(val) {
+  isPhone(val) {
     const { locales } = __CONFIG__.validate.mobilePhone
 
     return validator.isMobilePhone(val, locales)
@@ -63,27 +66,47 @@ class AuthValidator extends LinValidator {
 class VcodeValidator extends AuthValidator {}
 
 class SignupValidator extends AuthValidator {
+  constructor(ctx) {
+    super()
+    this.ctx = ctx
+  }
+
   async validateAccount(req) {
-    const { type, account } = req.body
+    const { type, email, telephone, secret, vcode } = req.body
+    const signup = this.ctx.session.signup || {}
 
-    if (!type || !account) return
-
-    if (this._isAccountType(type)) {
-      if (!this._isEmail(account)) {
-        throw new Error('请输入正确的邮箱')
-      }
-    } else if (this._isMobilePhoneType(type)) {
-      if (!this._isPhone(account)) {
-        throw new Error('请输入正确的手机号')
-      }
+    if (isEmpty(vcode)) {
+      throw new Error('请传入验证码参数')
+    }
+    if (!signup.vcode) {
+      throw new Error('还未获取验证码')
+    }
+    if (signup.vcode !== vcode) {
+      throw new Error('验证码错误')
     }
 
-    const user = await User.getData({ account })
+    if (this.isAccountType(type)) {
+      // 使用邮箱注册时，必须传密码
+      if (isEmpty(secret)) {
+        throw new Error('请传入密码参数')
+      }
+      if (!this.isEmail(email)) {
+        throw new Error('请输入正确的邮箱')
+      }
 
-    if (user) {
-      if (this._isAccountType(type)) {
+      const user = await User.getData({ email })
+
+      if (user) {
         throw new Error('该邮箱已经注册')
-      } else if (this._isMobilePhoneType(type)) {
+      }
+    } else if (this.isMobilePhoneType(type)) {
+      if (!this.isPhone(telephone)) {
+        throw new Error('请输入正确的手机号')
+      }
+
+      const user = await User.getData({ telephone })
+
+      if (user) {
         throw new Error('该手机号已经注册')
       }
     }
@@ -96,12 +119,12 @@ class LoginValidator extends AuthValidator {
 
     if (!type || !account) return
 
-    if (this._isAccountType(type)) {
-      if (!this._isPhone(account) && !this._isEmail(account)) {
+    if (this.isAccountType(type)) {
+      if (!this.isPhone(account) && !this.isEmail(account)) {
         throw new Error('请输入正确的手机号或邮箱')
       }
-    } else if (this._isMobilePhoneType(type)) {
-      if (!this._isPhone(account)) {
+    } else if (this.isMobilePhoneType(type)) {
+      if (!this.isPhone(account)) {
         throw new Error('请输入正确的手机号')
       }
     }

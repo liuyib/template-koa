@@ -3,6 +3,15 @@ const fs = require('fs')
 const jwt = require('jsonwebtoken')
 
 /**
+ * 判断是否为空（undefined 或 null）
+ * @param {*} val
+ * @returns {boolean}
+ */
+function isEmpty(val) {
+  return val === undefined || val === null
+}
+
+/**
  * 递归读取文件夹中的所有文件
  * @param {string} filePath             - 路径
  * @param {string} [fileTrace=filePath] - 存储读取过的路径
@@ -92,6 +101,7 @@ function pagination(data = [], start = 0, count = 20) {
 }
 
 module.exports = {
+  isEmpty,
   readFile,
   genToken,
   success,
