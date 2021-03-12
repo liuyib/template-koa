@@ -30,24 +30,18 @@ class EmailService {
   async send() {
     const { transporter, emailTo, vcode } = this
 
-    try {
-      const info = await transporter.sendMail({
-        // 邮件来源（任意字符）
-        from: `"${email.from}" <${email.authUser}>`,
-        // 接收列表（可以是多个邮箱，每个邮箱之间用半角逗号分隔）
-        to: emailTo,
-        // 邮件主题（标题）
-        subject: email.subject,
-        // 不支持 HTML 解析的邮箱，将会应用 text 中的内容
-        text: `您的验证码是 ${vcode}，验证码十分钟内有效。`,
-        // 支持 HTML 解析的邮箱，将会应用 html 中的内容
-        html: `您的验证码是 <b>${vcode}</b>，验证码十分钟内有效。`,
-      })
-
-      return info
-    } catch (error) {
-      throw new __ERROR__.VcodeException()
-    }
+    return await transporter.sendMail({
+      // 邮件来源（任意字符）
+      from: `"${email.from}" <${email.authUser}>`,
+      // 接收列表（可以是多个邮箱，每个邮箱之间用半角逗号分隔）
+      to: emailTo,
+      // 邮件主题（标题）
+      subject: email.subject,
+      // 不支持 HTML 解析的邮箱，将会应用 text 中的内容
+      text: `您的验证码是 ${vcode}，验证码十分钟内有效。`,
+      // 支持 HTML 解析的邮箱，将会应用 html 中的内容
+      html: `您的验证码是 <b>${vcode}</b>，验证码十分钟内有效。`,
+    })
   }
 
   genVcode(length = 6) {

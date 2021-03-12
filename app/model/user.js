@@ -59,10 +59,14 @@ class User extends Model {
       )
     }
 
-    if (_type === LOGIN_TYPE.ACCOUNT) {
-      vcode = await User.sendEmailVcode(email)
-    } else if (_type === LOGIN_TYPE.MOBILE_PHONE) {
-      vcode = await User.sendPhoneVcode(telephone)
+    try {
+      if (_type === LOGIN_TYPE.ACCOUNT) {
+        vcode = await User.sendEmailVcode(email)
+      } else if (_type === LOGIN_TYPE.MOBILE_PHONE) {
+        vcode = await User.sendPhoneVcode(telephone)
+      }
+    } catch (error) {
+      throw new __ERROR__.VcodeException(`验证码发送失败。${error}`)
     }
 
     if (vcode) {
@@ -81,7 +85,7 @@ class User extends Model {
     const emailService = await new EmailService(email)
     const vcode = emailService.vcode
 
-    emailService.send()
+    await emailService.send()
 
     return vcode
   }
