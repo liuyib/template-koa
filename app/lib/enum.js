@@ -64,6 +64,8 @@ const HTTP_CODE = {
    */
   // 验证码发送失败
   VCODE_FAILED: 11001,
+  // 账号注册失败
+  SIGNUP_FAILED: 11011,
 }
 
 module.exports = {

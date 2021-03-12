@@ -6,10 +6,10 @@ const verifyType = (types) => {
     const type = parseInt(req.body.type || req.path.type, 10)
 
     if (!type) {
-      throw new Error('type 不能为空')
+      throw new __ERROR__.ParamException('type 参数不能为空')
     }
     if (!types.isType(type)) {
-      throw new Error('type 参数不合法')
+      throw new __ERROR__.ParamException('type 参数不合法')
     }
   }
 }

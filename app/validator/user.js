@@ -69,14 +69,14 @@ class AuthValidator extends LinValidator {
 
     if (this.isAccountType(type)) {
       if (isEmpty(email)) {
-        throw new Error(`请传入 email 参数`)
+        throw new __ERROR__.ParamException(`请传入 email 参数`)
       }
     } else if (this.isMobilePhoneType(type)) {
       if (isEmpty(telephone)) {
-        throw new Error('请传入 telephone 参数')
+        throw new __ERROR__.ParamException('请传入 telephone 参数')
       }
     } else {
-      throw new Error(`未定义 type: ${type} 的处理逻辑`)
+      throw new __ERROR__.ParamException(`未定义 type: ${type} 的处理逻辑`)
     }
   }
 }
@@ -101,28 +101,28 @@ class SignupValidator extends AuthValidator {
 
     if (this.isAccountType(type)) {
       if (isEmpty(secret)) {
-        throw new Error('请传入 secret 参数')
+        throw new __ERROR__.ParamException('请传入 secret 参数')
       }
     }
     if (isEmpty(vcode)) {
-      throw new Error('请传入验证码参数')
+      throw new __ERROR__.ParamException('请传入验证码参数')
     }
 
     if (this.isAccountType(type)) {
       if (await User.getData({ email })) {
-        throw new Error('该邮箱已经注册')
+        throw new __ERROR__.SignupException('该邮箱已经注册')
       }
     } else if (this.isMobilePhoneType(type)) {
       if (await User.getData({ telephone })) {
-        throw new Error('该手机号已经注册')
+        throw new __ERROR__.SignupException('该手机号已经注册')
       }
     }
 
     if (!signup.vcode) {
-      throw new Error('还未获取验证码')
+      throw new __ERROR__.SignupException('还未获取验证码')
     }
     if (signup.vcode !== vcode) {
-      throw new Error('验证码错误')
+      throw new __ERROR__.VcodeException('验证码错误')
     }
   }
 }
@@ -135,11 +135,11 @@ class LoginValidator extends AuthValidator {
 
     if (this.isAccountType(type)) {
       if (!this.isPhone(account) && !this.isEmail(account)) {
-        throw new Error('请输入正确的手机号或邮箱')
+        throw new __ERROR__.ParamException('请输入正确的手机号或邮箱')
       }
     } else if (this.isMobilePhoneType(type)) {
       if (!this.isPhone(account)) {
-        throw new Error('请输入正确的手机号')
+        throw new __ERROR__.ParamException('请输入正确的手机号')
       }
     }
   }

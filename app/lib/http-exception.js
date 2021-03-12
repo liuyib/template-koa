@@ -50,6 +50,12 @@ class VcodeException extends HttpException {
   }
 }
 
+class SignupException extends HttpException {
+  constructor(msg = '注册失败', code = __CODE__.SIGNUP_FAILED) {
+    super(msg, code)
+  }
+}
+
 module.exports = {
   HttpException,
   ParamException,
@@ -58,4 +64,5 @@ module.exports = {
   AuthFailed,
   Success,
   VcodeException,
+  SignupException,
 }
