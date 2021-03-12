@@ -98,6 +98,10 @@ class LinValidator {
     // const map = new Map(memberKeys)
     for (const key of memberKeys) {
       const result = await this._check(key, alias)
+
+      if (result.isReturn) {
+        throw new ParamException([result.msg])
+      }
       if (!result.success) {
         errorMsgs.push(result.msg)
       }
@@ -142,6 +146,7 @@ class LinValidator {
     if (!result.pass) {
       const msg = `${isCustomFunc ? '' : `${key} `}${result.msg}`
       return {
+        isReturn: result.isReturn,
         msg: msg,
         success: false,
       }
@@ -231,6 +236,7 @@ class RuleField {
       if (!result.pass) {
         filedResult.msg = result.msg
         filedResult.legalValue = null
+        filedResult.isReturn = rule.params[1] === true
         // 一旦一条校验规则不通过，则立即终止这个字段的验证
         return filedResult
       }
