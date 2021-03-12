@@ -82,12 +82,22 @@ class AuthValidator extends LinValidator {
   }
 }
 
+/**
+ * 获取验证码
+ * 1. 邮箱注册：传 type + email 参数
+ * 2. 手机号注册：传 type + telephone 参数
+ */
 class VcodeValidator extends AuthValidator {
   validateAccount(req) {
     this.verifyType(req)
   }
 }
 
+/**
+ * 注册
+ * 1. 邮箱注册：传 type + email + secret + vcode 参数
+ * 2. 手机号注册：传 type + telephone + vcode 参数
+ */
 class SignupValidator extends AuthValidator {
   constructor(ctx) {
     super()
@@ -129,8 +139,9 @@ class SignupValidator extends AuthValidator {
 }
 
 /**
- * 1. 账户密码登录: 传 type + account + secret
- * 2. 手机验证码登录：传 type + account + vcode
+ * 1. 账户密码登录: 传 type + account + secret 参数
+ * 2. 手机验证码登录：传 type + account + vcode 参数
+ * 3. 微信小程序登录：传 type + account 参数（将 openid 作为 account 传入）
  */
 class LoginValidator extends AuthValidator {
   validateAccount(req) {
@@ -140,22 +151,27 @@ class LoginValidator extends AuthValidator {
       throw new __ERROR__.ParamException('请传入 account 参数')
     }
 
-    if (this.isAccountType(type)) {
-      if (isEmpty(secret)) {
-        throw new __ERROR__.ParamException('请传入 secret 参数')
-      }
-      if (!this.isPhone(account) && !this.isEmail(account)) {
-        throw new __ERROR__.ParamException('请输入正确的手机号或邮箱')
-      }
-    } else if (this.isMobilePhoneType(type)) {
-      if (isEmpty(vcode)) {
-        throw new __ERROR__.ParamException('请传入 vcode 参数')
-      }
-      if (!this.isPhone(account)) {
-        throw new __ERROR__.ParamException('请输入正确的手机号')
-      }
-    } else {
-      throw new __ERROR__.ParamException(`未定义 type: ${type} 的处理逻辑`)
+    switch (type) {
+      case LOGIN_TYPE.ACCOUNT:
+        if (isEmpty(secret)) {
+          throw new __ERROR__.ParamException('请传入 secret 参数')
+        }
+        if (!this.isPhone(account) && !this.isEmail(account)) {
+          throw new __ERROR__.ParamException('请输入正确的手机号或邮箱')
+        }
+        break
+      case LOGIN_TYPE.MOBILE_PHONE:
+        if (isEmpty(vcode)) {
+          throw new __ERROR__.ParamException('请传入 vcode 参数')
+        }
+        if (!this.isPhone(account)) {
+          throw new __ERROR__.ParamException('请输入正确的手机号')
+        }
+        break
+      case LOGIN_TYPE.MINI_PROGRAM:
+        break
+      default:
+        break
     }
   }
 }

@@ -30,7 +30,7 @@ class WXService {
 
       return genToken(user.id, __AUTH__.USER)
     } catch (error) {
-      throw new __ERROR__.AuthFailed(error || 'openid 获取失败')
+      throw new __ERROR__.AuthFailed(error.message || 'openid 获取失败')
     }
   }
 }

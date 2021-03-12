@@ -16,10 +16,10 @@ class Token {
    * @returns {string} 颁发的 JWT
    */
   static async getData({ type, account, secret }) {
-    const tokenType = parseInt(type, 10)
+    const _type = parseInt(type, 10)
     let token = ''
 
-    switch (tokenType) {
+    switch (_type) {
       case LOGIN_TYPE.ACCOUNT:
         token = await userAccountLogin(account, secret)
         break
@@ -30,9 +30,7 @@ class Token {
         token = await userMinipgmLogin(account)
         break
       default:
-        throw new __ERROR__.ParamException(
-          `未定义 type: ${tokenType} 的处理函数`,
-        )
+        throw new __ERROR__.ParamException(`未定义 type: ${_type} 的处理函数`)
     }
 
     return token
