@@ -25,7 +25,7 @@ class WXService {
       let user = await User.getData({ openid })
 
       if (!user) {
-        user = await User.create({ openid })
+        user = await User.setData({ openid })
       }
 
       return genToken(user.id, __AUTH__.USER)

@@ -19,6 +19,19 @@ class User extends Model {
   }
 
   /**
+   * 添加数据
+   * @param {Object} [option={}] - 可选参数（Key 应为数据库中的列）
+   * @returns {Object} User 模型的实例
+   */
+  static async setData(option = {}) {
+    const param = { account: '' }
+
+    Object.assign(param, option)
+
+    return User.create(param)
+  }
+
+  /**
    * 注册用户
    * @param {Object} param
    * @param {number} param.type        - 注册类型
@@ -31,9 +44,9 @@ class User extends Model {
     const _type = parseInt(type, 10)
 
     if (_type === LOGIN_TYPE.ACCOUNT) {
-      await User.create({ email, secret })
+      await User.setData({ email, secret })
     } else if (_type === LOGIN_TYPE.MOBILE_PHONE) {
-      await User.create({ telephone })
+      await User.setData({ telephone })
     } else {
       throw new __ERROR__.ParamException(`未定义 type: ${_type} 的处理函数`)
     }
@@ -132,9 +145,7 @@ User.init(
       type: DataTypes.STRING,
       unique: true,
       comment: '账号（通过 uid 生成）',
-      set(val) {
-        if (!val) return
-
+      set() {
         const { prefix, uidLength } = __CONFIG__.account
         const genRandomAccount = `${prefix}${uid(uidLength)}`
         this.setDataValue('account', genRandomAccount)
