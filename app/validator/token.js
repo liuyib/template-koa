@@ -1,5 +1,5 @@
-const { LinValidator, Rule } = require('~lib/lin-validator-v2')
-const { NotEmptyValidator } = require('~validator/validator')
+const { LinValidator, Rule } = require('~lib/validator')
+const { NotEmptyValidator } = require('~validator/common')
 const { verifyType } = require('./_util')
 const { LOGIN_TYPE } = require('~lib/enum')
 

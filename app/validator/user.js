@@ -1,5 +1,5 @@
 const validator = require('validator')
-const { LinValidator, Rule } = require('~lib/lin-validator-v2')
+const { LinValidator, Rule } = require('~lib/validator')
 const { isEmpty } = require('~lib/util')
 const { LOGIN_TYPE } = require('~lib/enum')
 const { User } = require('~model/user')
