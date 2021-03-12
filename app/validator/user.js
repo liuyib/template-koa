@@ -25,6 +25,7 @@ class AuthValidator extends LinValidator {
       new Rule('isEmail', '邮箱不合法'),
     ]
     this.account = [
+      new Rule('isReturn'),
       new Rule('isOptional'),
       new Rule('isLength', '账号不能为空', { min: 1 }),
     ]
@@ -33,7 +34,7 @@ class AuthValidator extends LinValidator {
       new Rule('isLength', '密码长度必须 6~32 个字符', { min: 6, max: 32 }),
       new Rule(
         'matches',
-        ' 密码至少 6 位，必须包含大小写字母和数字，特殊字符只允许 !@#$%.',
+        '密码必须包含大小写字母、数字和特殊字符，特殊字符只允许 !@#$%.',
         /^\S*(?=\S{6,})(?=\S*\d)(?=\S*[A-Z])(?=\S*[a-z])(?=\S*[!@#$%.])\S*$/,
       ),
     ]
@@ -127,20 +128,34 @@ class SignupValidator extends AuthValidator {
   }
 }
 
+/**
+ * 1. 账户密码登录: 传 type + account + secret
+ * 2. 手机验证码登录：传 type + account + vcode
+ */
 class LoginValidator extends AuthValidator {
   validateAccount(req) {
-    const { type, account } = req.body
+    const { type, account, secret, vcode } = req.body
 
-    if (!type || !account) return
+    if (isEmpty(account)) {
+      throw new __ERROR__.ParamException('请传入 account 参数')
+    }
 
     if (this.isAccountType(type)) {
+      if (isEmpty(secret)) {
+        throw new __ERROR__.ParamException('请传入 secret 参数')
+      }
       if (!this.isPhone(account) && !this.isEmail(account)) {
         throw new __ERROR__.ParamException('请输入正确的手机号或邮箱')
       }
     } else if (this.isMobilePhoneType(type)) {
+      if (isEmpty(vcode)) {
+        throw new __ERROR__.ParamException('请传入 vcode 参数')
+      }
       if (!this.isPhone(account)) {
         throw new __ERROR__.ParamException('请输入正确的手机号')
       }
+    } else {
+      throw new __ERROR__.ParamException(`未定义 type: ${type} 的处理逻辑`)
     }
   }
 }
