@@ -40,20 +40,19 @@ class User extends Model {
   }
 
   /**
-   * 向用户（邮箱、手机）发送验证码
+   * 向用户（邮箱、手机）发送验证码（并存入 Session 等待验证）
    * @param {Object} param
    * @param {number} param.type    - 登录类型
    * @param {string} param.account - 账号
-   * @param {Object} param.ctx     - Koa 中间件的 ctx 参数
+   * @param {Object} param.session - Session
    * @returns {string} 验证码
    */
-  static async sendVcode({ type, account, ctx }) {
-    const session = ctx.session.signup
+  static async sendVcode({ type, account, session }) {
+    const _session = session.signup || {}
     const _type = parseInt(type, 10)
-    const _account = session ? session.account : ''
-    let vcode = session ? session.vcode : ''
+    let vcode = _session.vcode
 
-    if (_account === account && vcode) {
+    if (_session.account === account && vcode) {
       throw new __ERROR__.VcodeException(
         '验证码已发送。没有收到？请检查您的邮箱是否正确',
       )
@@ -70,7 +69,7 @@ class User extends Model {
     }
 
     if (vcode) {
-      ctx.session.signup = { account, vcode }
+      _session.signup = { account, vcode }
     }
 
     return vcode

@@ -11,7 +11,7 @@ const { success } = require('~lib/util')
 
 router.post('/vcode', async (ctx) => {
   const v = await new VcodeValidator().validate(ctx)
-  await User.sendVcode({ ...v.get('body'), ctx })
+  await User.sendVcode({ ...v.get('body'), session: ctx.session })
 
   success({
     msg: '验证码发送成功',
