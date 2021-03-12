@@ -13,11 +13,13 @@ class AuthValidator extends LinValidator {
       new Rule('isIn', '不合法的登录类型', Object.values(LOGIN_TYPE)),
     ]
     this.telephone = [
+      new Rule('isReturn'),
       new Rule('isOptional'),
       new Rule('isLength', '手机号不能为空', { min: 1 }),
       new Rule('isMobilePhone', '手机号不合法'),
     ]
     this.email = [
+      new Rule('isReturn'),
       new Rule('isOptional'),
       new Rule('isLength', '邮箱不能为空', { min: 1 }),
       new Rule('isEmail', '邮箱不合法'),
@@ -61,9 +63,29 @@ class AuthValidator extends LinValidator {
 
     return validator.isMobilePhone(val, locales)
   }
+
+  verifyType(req) {
+    const { type, email, telephone } = req.body
+
+    if (this.isAccountType(type)) {
+      if (isEmpty(email)) {
+        throw new Error(`请传入 email 参数`)
+      }
+    } else if (this.isMobilePhoneType(type)) {
+      if (isEmpty(telephone)) {
+        throw new Error('请传入 telephone 参数')
+      }
+    } else {
+      throw new Error(`未定义 type: ${type} 的处理逻辑`)
+    }
+  }
 }
 
-class VcodeValidator extends AuthValidator {}
+class VcodeValidator extends AuthValidator {
+  validateAccount(req) {
+    this.verifyType(req)
+  }
+}
 
 class SignupValidator extends AuthValidator {
   constructor(ctx) {
@@ -71,44 +93,36 @@ class SignupValidator extends AuthValidator {
     this.ctx = ctx
   }
 
-  async validateAccount(req) {
+  async validateParams(req) {
     const { type, email, telephone, secret, vcode } = req.body
     const signup = this.ctx.session.signup || {}
 
+    this.verifyType(req)
+
+    if (this.isAccountType(type)) {
+      if (isEmpty(secret)) {
+        throw new Error('请传入 secret 参数')
+      }
+    }
     if (isEmpty(vcode)) {
       throw new Error('请传入验证码参数')
     }
+
+    if (this.isAccountType(type)) {
+      if (await User.getData({ email })) {
+        throw new Error('该邮箱已经注册')
+      }
+    } else if (this.isMobilePhoneType(type)) {
+      if (await User.getData({ telephone })) {
+        throw new Error('该手机号已经注册')
+      }
+    }
+
     if (!signup.vcode) {
       throw new Error('还未获取验证码')
     }
     if (signup.vcode !== vcode) {
       throw new Error('验证码错误')
-    }
-
-    if (this.isAccountType(type)) {
-      // 使用邮箱注册时，必须传密码
-      if (isEmpty(secret)) {
-        throw new Error('请传入密码参数')
-      }
-      if (!this.isEmail(email)) {
-        throw new Error('请输入正确的邮箱')
-      }
-
-      const user = await User.getData({ email })
-
-      if (user) {
-        throw new Error('该邮箱已经注册')
-      }
-    } else if (this.isMobilePhoneType(type)) {
-      if (!this.isPhone(telephone)) {
-        throw new Error('请输入正确的手机号')
-      }
-
-      const user = await User.getData({ telephone })
-
-      if (user) {
-        throw new Error('该手机号已经注册')
-      }
     }
   }
 }

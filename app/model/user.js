@@ -47,9 +47,10 @@ class User extends Model {
    * @param {Object} param.session - Session
    * @returns {string} 验证码
    */
-  static async sendVcode({ type, account, session }) {
+  static async sendVcode({ type, email, telephone, session }) {
     const _session = session.signup || {}
     const _type = parseInt(type, 10)
+    const account = email || telephone
     let vcode = _session.vcode
 
     if (_session.account === account && vcode) {
@@ -58,18 +59,14 @@ class User extends Model {
       )
     }
 
-    switch (_type) {
-      case LOGIN_TYPE.ACCOUNT:
-        vcode = await User.sendEmailVcode(account)
-        break
-      case LOGIN_TYPE.MOBILE_PHONE:
-        break
-      default:
-        throw new __ERROR__.ParamException(`未定义 type: ${_type} 的处理函数`)
+    if (_type === LOGIN_TYPE.ACCOUNT) {
+      vcode = await User.sendEmailVcode(email)
+    } else if (_type === LOGIN_TYPE.MOBILE_PHONE) {
+      vcode = await User.sendPhoneVcode(telephone)
     }
 
     if (vcode) {
-      _session.signup = { account, vcode }
+      session.signup = { account, vcode }
     }
 
     return vcode
@@ -87,6 +84,11 @@ class User extends Model {
     emailService.send()
 
     return vcode
+  }
+
+  static async sendPhoneVcode(telephone) {
+    // TODO:
+    return 123
   }
 
   /**
