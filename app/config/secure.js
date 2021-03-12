@@ -50,4 +50,15 @@ module.exports = {
       maxAge: 1000 * 60 * 10,
     },
   },
+  // 邮件相关
+  email: {
+    // 发送方的邮箱
+    authUser: 'liuyibo0616@qq.com',
+    // 授权码（不是邮箱登录密码）
+    authPass: env.EMAIL_AUTH_PASS,
+    // 发送方的称呼（人名、公司名、产品名、等）
+    from: '[your name]',
+    // 主题
+    subject: '验证码信息',
+  },
 }

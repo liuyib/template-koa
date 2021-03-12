@@ -1,9 +1,22 @@
 const Router = require('koa-router')
 const router = new Router({ prefix: '/v1/user' })
-const { SignupValidator, LoginValidator } = require('~validator/user')
+const {
+  VcodeValidator,
+  SignupValidator,
+  LoginValidator,
+} = require('~validator/user')
 const { User } = require('~model/user')
 const { Token } = require('~model/token')
 const { success } = require('~lib/util')
+
+router.post('/vcode', async (ctx) => {
+  const v = await new VcodeValidator().validate(ctx)
+  await User.sendVcode({ ...v.get('body'), ctx })
+
+  success({
+    msg: '验证码发送成功',
+  })
+})
 
 /**
  * 用户注册

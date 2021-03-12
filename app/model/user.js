@@ -3,6 +3,7 @@ const { uid } = require('uid/secure')
 const { Model, DataTypes } = require('sequelize')
 const { sequelize } = require('~lib/db')
 const { LOGIN_TYPE } = require('~lib/enum')
+const { EmailService } = require('~service/email')
 
 /**
  * 用户表（实体表）
@@ -24,24 +25,59 @@ class User extends Model {
    * @param {string} [param.secret] - 密码
    * @returns {Object} User 模型的实例
    */
-  static async setData({ type, account, secret = '' }) {
+  static async setData({ account, secret = '' }) {
+    return await User.create({ account, secret })
+  }
+
+  /**
+   * 向用户（邮箱、手机）发送验证码
+   * @param {Object} param
+   * @param {number} param.type    - 登录类型
+   * @param {string} param.account - 账号
+   * @param {Object} param.ctx     - Koa 中间件的 ctx 参数
+   * @returns {string} 验证码
+   */
+  static async sendVcode({ type, account, ctx }) {
+    const session = ctx.session.signup
     const _type = parseInt(type, 10)
+    const _account = session ? session.account : ''
+    let vcode = session ? session.vcode : ''
+
+    if (_account === account && vcode) {
+      throw new __ERROR__.VcodeException(
+        '验证码已发送。没有收到？请检查您的邮箱是否正确',
+      )
+    }
 
     switch (_type) {
       case LOGIN_TYPE.ACCOUNT:
+        vcode = await User.sendEmailVcode(account)
         break
       case LOGIN_TYPE.MOBILE_PHONE:
-        break
-      case LOGIN_TYPE.MINI_PROGRAM:
         break
       default:
         throw new __ERROR__.ParamException(`未定义 type: ${_type} 的处理函数`)
     }
 
-    return await User.create({
-      account,
-      secret,
-    })
+    if (vcode) {
+      ctx.session.signup = { account, vcode }
+    }
+
+    return vcode
+  }
+
+  /**
+   * 向用户填写的邮箱发送验证码
+   * @param {string} email - 用户邮箱
+   * @returns {string} 验证码
+   */
+  static async sendEmailVcode(email) {
+    const emailService = await new EmailService(email)
+    const vcode = emailService.vcode
+
+    emailService.send()
+
+    return vcode
   }
 
   /**

@@ -44,6 +44,12 @@ class Success extends HttpException {
   }
 }
 
+class VcodeException extends HttpException {
+  constructor(msg = '验证码发送失败', code = __CODE__.VCODE_FAILED) {
+    super(msg, code)
+  }
+}
+
 module.exports = {
   HttpException,
   ParamException,
@@ -51,4 +57,5 @@ module.exports = {
   Forbbiden,
   AuthFailed,
   Success,
+  VcodeException,
 }

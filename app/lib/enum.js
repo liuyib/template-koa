@@ -58,7 +58,12 @@ const HTTP_CODE = {
   NOT_FOUND: 10404,
   // 服务器错误
   SERVER_ERROR: 10500,
-  // TODO: 添加你需要自定义的业务错误码
+
+  /**
+   * 自定义业务错误码
+   */
+  // 验证码发送失败
+  VCODE_FAILED: 11001,
 }
 
 module.exports = {

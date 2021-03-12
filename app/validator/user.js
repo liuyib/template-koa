@@ -60,6 +60,8 @@ class AuthValidator extends LinValidator {
   }
 }
 
+class VcodeValidator extends AuthValidator {}
+
 class SignupValidator extends AuthValidator {
   async validateAccount(req) {
     const { type, account } = req.body
@@ -107,6 +109,7 @@ class LoginValidator extends AuthValidator {
 }
 
 module.exports = {
+  VcodeValidator,
   SignupValidator,
   LoginValidator,
 }
