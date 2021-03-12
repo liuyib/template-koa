@@ -22,8 +22,8 @@ router.post('/vcode', async (ctx) => {
  * 用户注册
  */
 router.post('/signup', async (ctx) => {
-  const v = await new SignupValidator().validate(ctx)
-  await User.setData(v.get('body'))
+  const v = await new SignupValidator(ctx).validate(ctx)
+  await User.signup(v.get('body'))
 
   success({
     msg: '注册成功',

@@ -19,14 +19,24 @@ class User extends Model {
   }
 
   /**
-   * 插入数据
+   * 注册用户
    * @param {Object} param
-   * @param {string} param.account  - 账号
-   * @param {string} [param.secret] - 密码
-   * @returns {Object} User 模型的实例
+   * @param {number} param.type        - 注册类型
+   * @param {string} [param.email]     - 邮箱
+   * @param {string} [param.telephone] - 手机号
+   * @param {string} [param.secret]    - 密码
+   * @returns
    */
-  static async setData({ account, secret = '' }) {
-    return await User.create({ account, secret })
+  static async signup({ type, email, telephone, secret }) {
+    const _type = parseInt(type, 10)
+
+    if (_type === LOGIN_TYPE.ACCOUNT) {
+      await User.create({ email, secret })
+    } else if (_type === LOGIN_TYPE.MOBILE_PHONE) {
+      await User.create({ telephone })
+    } else {
+      throw new __ERROR__.ParamException(`未定义 type: ${_type} 的处理函数`)
+    }
   }
 
   /**
@@ -138,10 +148,12 @@ User.init(
     },
     telephone: {
       type: DataTypes.STRING,
+      unique: true,
       comment: '手机号',
     },
     email: {
       type: DataTypes.STRING,
+      unique: true,
       comment: '邮箱',
     },
     nickname: {
