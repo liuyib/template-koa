@@ -4,6 +4,8 @@ const { isEmpty } = require('~lib/util')
 const { LOGIN_TYPE } = require('~lib/enum')
 const { User } = require('~model/user')
 
+const { locales } = __CONFIG__.validate.mobilePhone
+
 class AuthValidator extends LinValidator {
   constructor() {
     super()
@@ -16,7 +18,7 @@ class AuthValidator extends LinValidator {
       new Rule('isReturn'),
       new Rule('isOptional'),
       new Rule('isLength', '手机号不能为空', { min: 1 }),
-      new Rule('isMobilePhone', '手机号不合法'),
+      new Rule('isMobilePhone', '手机号不合法', locales),
     ]
     this.email = [
       new Rule('isReturn'),
@@ -60,8 +62,6 @@ class AuthValidator extends LinValidator {
   }
 
   isPhone(val) {
-    const { locales } = __CONFIG__.validate.mobilePhone
-
     return validator.isMobilePhone(val, locales)
   }
 
