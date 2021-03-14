@@ -32,6 +32,18 @@ class User extends Model {
   }
 
   /**
+   * 验证用户是否存在
+   * @param {number} id - 用户 ID
+   */
+  static async verifyExist(id) {
+    const user = User.getData({ id })
+
+    if (!user) {
+      throw new __ERROR__.NotFound(`[${__CODE__.USER_NOTFOUND}] 用户查询失败`)
+    }
+  }
+
+  /**
    * 注册用户
    * @param {Object} param
    * @param {number} param.type        - 注册类型
