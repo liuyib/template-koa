@@ -32,6 +32,7 @@
   },
   "homepage": "https://github.com/liuyib/koa-template",
   "dependencies": {
+    "@koa/cors": "^3.1.0",
     "axios": "^0.21.1",
     "basic-auth": "^2.0.1",
     "bcryptjs": "^2.4.3",
