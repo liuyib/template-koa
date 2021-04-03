@@ -60,4 +60,9 @@ module.exports = {
       locales: ['zh-CN'],
     },
   },
+  // 验证码相关
+  vcode: {
+    // 验证码允许发送的间隔时间（单位 s）
+    interval: 60,
+  },
 }

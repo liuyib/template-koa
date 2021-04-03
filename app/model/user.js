@@ -3,12 +3,28 @@ const { uid } = require('uid/secure')
 const { Model, DataTypes, Op } = require('sequelize')
 const { sequelize } = require('~lib/db')
 const { LOGIN_TYPE } = require('~lib/enum')
-const { EmailService } = require('~service/email')
+const { snakeCaseObj } = require('~lib/util')
+const { VcodeService } = require('~service/vcode')
 
 /**
  * 用户表（实体表）
  */
 class User extends Model {
+  /**
+   * 操作数据库时，只允许改动的字段（防止传入多余的字段引起报错）
+   */
+  static get fields() {
+    return [
+      'telephone',
+      'email',
+      'secret',
+      'nickname',
+      'sex',
+      'avatar',
+      'address_id',
+    ]
+  }
+
   /**
    * 获取数据
    * @param {Object} where - 获取数据的查询条件
@@ -32,14 +48,20 @@ class User extends Model {
   }
 
   /**
-   * 验证用户是否存在
-   * @param {number} id - 用户 ID
+   * 修改数据
+   * @param {Object} column - 要修改的数据列
+   * @param {Object} transaction - 使用 Sequelize 事务时的参数
+   * @returns
    */
-  static async verifyExist(id) {
-    const user = User.getData({ id })
-
-    if (!user) {
-      throw new __ERROR__.NotFound(`[${__CODE__.USER_NOTFOUND}] 用户查询失败`)
+  static async setData(column, transaction) {
+    try {
+      await User.update(snakeCaseObj(column), {
+        where: { id: column.id },
+        fields: User.fields,
+        transaction,
+      })
+    } catch (error) {
+      throw new __ERROR__.UserException()
     }
   }
 
@@ -53,71 +75,13 @@ class User extends Model {
    * @returns
    */
   static async signup({ type, email, telephone, secret }) {
-    const _type = parseInt(type, 10)
-
-    if (_type === LOGIN_TYPE.ACCOUNT) {
+    if (type === LOGIN_TYPE.ACCOUNT) {
       await User.addData({ email, secret })
-    } else if (_type === LOGIN_TYPE.MOBILE_PHONE) {
+    } else if (type === LOGIN_TYPE.MOBILE_PHONE) {
       await User.addData({ telephone })
     } else {
-      throw new __ERROR__.ParamException(`未定义 type: ${_type} 的处理函数`)
+      throw new __ERROR__.ParamException(`未定义 type: ${type} 的处理函数`)
     }
-  }
-
-  /**
-   * 向用户（邮箱、手机）发送验证码（并存入 Session 等待验证）
-   * @param {Object} param
-   * @param {number} param.type    - 登录类型
-   * @param {string} param.account - 账号
-   * @param {Object} param.session - Session
-   * @returns {string} 验证码
-   */
-  static async sendVcode({ type, email, telephone, session }) {
-    const _session = session.signup || {}
-    const _type = parseInt(type, 10)
-    const account = email || telephone
-    let vcode = _session.vcode
-
-    if (_session.account === account && vcode) {
-      throw new __ERROR__.VcodeException(
-        '验证码已发送。没有收到？请检查您的邮箱是否正确',
-      )
-    }
-
-    try {
-      if (_type === LOGIN_TYPE.ACCOUNT) {
-        vcode = await User.sendEmailVcode(email)
-      } else if (_type === LOGIN_TYPE.MOBILE_PHONE) {
-        vcode = await User.sendPhoneVcode(telephone)
-      }
-    } catch (error) {
-      throw new __ERROR__.VcodeException(`验证码发送失败。${error}`)
-    }
-
-    if (vcode) {
-      session.signup = { account, vcode }
-    }
-
-    return vcode
-  }
-
-  /**
-   * 向用户填写的邮箱发送验证码
-   * @param {string} email - 用户邮箱
-   * @returns {string} 验证码
-   */
-  static async sendEmailVcode(email) {
-    const emailService = await new EmailService(email)
-    const vcode = emailService.vcode
-
-    await emailService.send()
-
-    return vcode
-  }
-
-  static async sendPhoneVcode(telephone) {
-    // TODO:
-    return 123
   }
 
   /**
@@ -145,6 +109,29 @@ class User extends Model {
     }
 
     return user
+  }
+
+  /**
+   * 验证用户是否存在
+   * @param {number} id - 用户 ID
+   * @returns
+   */
+  static async verifyExist(id) {
+    const user = await User.getData({ id })
+
+    if (!user) {
+      throw new __ERROR__.NotFound(`[${__CODE__.USER_NOTFOUND}] 用户查询失败`)
+    }
+
+    return user
+  }
+
+  static async sendVcode(params) {
+    return await VcodeService.sendVcode(params)
+  }
+
+  static async verifyVcode(params) {
+    return await VcodeService.verifyVcode(params)
   }
 }
 
@@ -187,7 +174,7 @@ User.init(
       comment: '邮箱',
     },
     nickname: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(12),
       comment: '昵称',
     },
     sex: {
@@ -209,6 +196,19 @@ User.init(
     tableName: 'user',
   },
 )
+
+/**
+ * TEMPLATE: 设置外键
+ */
+// const hasManyOption = {
+//   onDelete: 'CASCADE',
+//   onUpdate: 'CASCADE',
+//   foreignKey: 'user_id',
+// }
+
+// User.hasMany(OtherModel, {
+//   ...hasManyOption,
+// })
 
 module.exports = {
   User,
