@@ -23,7 +23,7 @@ class User extends Model {
    * @param {Object} [option={}] - 可选参数（Key 应为数据库中的列）
    * @returns {Object} User 模型的实例
    */
-  static async setData(option = {}) {
+  static async addData(option = {}) {
     const param = { account: '' }
 
     Object.assign(param, option)
@@ -56,9 +56,9 @@ class User extends Model {
     const _type = parseInt(type, 10)
 
     if (_type === LOGIN_TYPE.ACCOUNT) {
-      await User.setData({ email, secret })
+      await User.addData({ email, secret })
     } else if (_type === LOGIN_TYPE.MOBILE_PHONE) {
-      await User.setData({ telephone })
+      await User.addData({ telephone })
     } else {
       throw new __ERROR__.ParamException(`未定义 type: ${_type} 的处理函数`)
     }
@@ -190,8 +190,16 @@ User.init(
       type: DataTypes.STRING,
       comment: '昵称',
     },
+    sex: {
+      type: DataTypes.SMALLINT,
+      comment: '性别',
+    },
+    avatar: {
+      type: DataTypes.STRING,
+      comment: '头像',
+    },
     openid: {
-      type: DataTypes.STRING(64),
+      type: DataTypes.STRING(128),
       unique: true,
       comment: '微信用户唯一标识 openid',
     },
