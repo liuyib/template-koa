@@ -62,6 +62,7 @@ const HTTP_CODE = {
   /**
    * 自定义业务错误码
    */
+  // 用户不存在
   USER_NOTFOUND: 10904,
   // 验证码发送失败
   VCODE_FAILED: 11001,

@@ -1,5 +1,5 @@
 const nodemailer = require('nodemailer')
-const { vcode } = require('./vcode')
+const { genRandom } = require('~lib/util')
 
 const email = __CONFIG__.email
 
@@ -45,7 +45,7 @@ class EmailService {
   }
 
   genVcode(length = 6) {
-    return vcode(length)
+    return genRandom(length)
   }
 }
 

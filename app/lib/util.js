@@ -1,15 +1,7 @@
 const path = require('path')
 const fs = require('fs')
 const jwt = require('jsonwebtoken')
-
-/**
- * 判断是否为空（undefined 或 null）
- * @param {*} val
- * @returns {boolean}
- */
-function isEmpty(val) {
-  return val === undefined || val === null
-}
+const { isObject } = require('./isType')
 
 /**
  * 递归读取文件夹中的所有文件
@@ -61,6 +53,17 @@ function genToken(uid, permission) {
 }
 
 /**
+ * 生成随机字符串，可用于发送 6 位验证码（目前仅生成数字字符串）
+ * @param {number} length - 生成长度
+ * @returns {number}
+ */
+function genRandom(length) {
+  return `${Math.random()
+    .toFixed(length)
+    .slice(-1 * length)}`
+}
+
+/**
  * 接口请求成功，返回给客户端的数据
  * 不传参数时，返回的数据包含 code, msg, request 属性
  * @param {(string|Object)} [param] - string: 设置 res.msg
@@ -100,10 +103,45 @@ function pagination(data = [], start = 0, count = 20) {
   return result
 }
 
+/**
+ * 将字符串从 camel case 风格转为 snake case 风格
+ * @param {string} val
+ * @returns {string}
+ */
+function camel2SnakeCase(val) {
+  if (typeof val !== 'string') return ''
+
+  return val.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`)
+}
+
+/**
+ * 将对象的键、字符数组的项，全部转为 snake case 风格
+ * @param {(Object|string[])} target
+ * @returns {(Object|string[])}
+ */
+function snakeCaseObj(target) {
+  let result = {}
+
+  if (isObject(target)) {
+    for (const key in target) {
+      if (Object.hasOwnProperty.call(target, key)) {
+        const snakeCaseKey = camel2SnakeCase(key)
+        result[snakeCaseKey] = target[key]
+      }
+    }
+  } else if (Array.isArray(target)) {
+    result = target.map((item) => camel2SnakeCase(item))
+  }
+
+  return result
+}
+
 module.exports = {
-  isEmpty,
   readFile,
   genToken,
+  genRandom,
   success,
   pagination,
+  camel2SnakeCase,
+  snakeCaseObj,
 }

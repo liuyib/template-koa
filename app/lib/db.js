@@ -1,4 +1,5 @@
 const { Sequelize, Model } = require('sequelize')
+const config = require('../config/secure')
 const _ = require('lodash')
 
 const {
@@ -10,7 +11,7 @@ const {
   password,
   logging,
   timezone,
-} = __CONFIG__.db
+} = config.db
 
 const sequelize = new Sequelize(name, user, password, {
   dialect,
@@ -27,12 +28,14 @@ const sequelize = new Sequelize(name, user, password, {
     updatedAt: 'updated_at',
     deletedAt: 'deleted_at',
     underscored: true,
-    scopes: {
-      no_timestamp: {
-        attributes: {
-          exclude: ['created_at', 'updated_at', 'deleted_at'],
-        },
+    defaultScope: {
+      attributes: {
+        exclude: ['created_at', 'updated_at', 'deleted_at'],
       },
+    },
+    scopes: {
+      all: { attributes: { exclude: [] } },
+      createAt: { attributes: { exclude: ['updated_at', 'deleted_at'] } },
     },
   },
 })
