@@ -1,4 +1,5 @@
 const { env } = process
+const isDev = env.NODE_ENV === 'development'
 
 module.exports = {
   // 数据库相关
@@ -18,8 +19,8 @@ module.exports = {
   jwt: {
     // 可以任意随机字符串（长度适当，不要过长或过短）
     secretKey: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()',
-    // JWT 过期时间
-    expiresIn: 60 * 60,
+    // JWT 过期时间（单位 s）
+    expiresIn: 60 * 60 * (isDev ? 24 : 1),
   },
   // 微信相关
   wx: {
@@ -30,7 +31,7 @@ module.exports = {
     // 获取用户唯一标识 OpenID、用户在微信开放平台帐号下的唯一标识 UnionID（若当前小程序已绑定到微信开放平台帐号）和 会话密钥 session_key
     // 详见：https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/login.html
     loginUrl:
-      'https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_codeF',
+      'https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code',
   },
   // 随机账号生成（前缀 + uid）。用户注册时，会自动生成一个随机账号，可用于登录。
   account: {
