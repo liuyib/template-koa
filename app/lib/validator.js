@@ -217,6 +217,13 @@ class Rule {
     if (this.name === 'isOptional') {
       return new RuleResult({ pass: true })
     }
+    if (this.name === 'isExclude') {
+      return new RuleResult({
+        pass: false,
+        isReturn: true,
+        msg: this.msg || this.message,
+      })
+    }
     if (!validator[this.name](field + '', ...this.params)) {
       return new RuleResult({
         pass: false,
