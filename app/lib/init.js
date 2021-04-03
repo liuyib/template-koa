@@ -1,7 +1,5 @@
 const Router = require('koa-router')
-const path = require('path')
-
-const config = require('~config/setting')
+const config = require('~config/index')
 const { readFile } = require('~lib/util')
 const { AUTH_LEVEL, HTTP_CODE } = require('~lib/enum')
 
@@ -48,22 +46,8 @@ class Init {
    * @returns {Object} 配置的数据对象
    */
   static loadConfig() {
-    const pathConfig = config.path
-
-    pathConfig.root = path.join(process.cwd(), pathConfig.root)
-
-    // 将 root 路径作为前缀，连接在其他路径上
-    for (const [key, val] of Object.entries(pathConfig)) {
-      if (key !== 'root') {
-        pathConfig[key] = path.join(pathConfig.root, val)
-      }
-    }
-
-    const allConfig = require(pathConfig.config)
-
-    allConfig.path = pathConfig
-
-    return allConfig
+    const configFilePath = config.path.config
+    return require(configFilePath)
   }
 
   /**
@@ -76,6 +60,7 @@ class Init {
   }
 
   /**
+   * 加载权限常量
    * @api private
    * @returns {Object}
    */
@@ -84,6 +69,7 @@ class Init {
   }
 
   /**
+   * 加载 HTTP 业务码
    * @api private
    * @returns {Object}
    */
@@ -97,7 +83,8 @@ class Init {
    * @returns
    */
   static loadRoute() {
-    const apiPaths = readFile(__CONFIG__.path.api)
+    const apiDir = config.path.api
+    const apiPaths = readFile(apiDir)
 
     for (const apiPath of apiPaths) {
       const router = require(apiPath)
