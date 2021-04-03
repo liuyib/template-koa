@@ -13,6 +13,7 @@ class Init {
   static config(app) {
     Init.app = app
     Init.loadGlobalVar()
+    Init.loadSession()
     Init.loadRoute()
   }
 
@@ -75,6 +76,18 @@ class Init {
    */
   static loadHttpCode() {
     return HTTP_CODE
+  }
+
+  /**
+   * 加载 Session
+   * @api private
+   * @returns {Object}
+   */
+  static loadSession() {
+    Init.app.use(async (ctx, next) => {
+      global.__SESSION__ = ctx.session
+      await next()
+    })
   }
 
   /**

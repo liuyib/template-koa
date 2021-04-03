@@ -9,7 +9,8 @@
     "__CONFIG__": "readonly",
     "__ERROR__": "readonly",
     "__AUTH__": "readonly",
-    "__CODE__": "readonly"
+    "__CODE__": "readonly",
+    "__SESSION__": "readonly"
   },
   "extends": ["standard", "prettier"],
   "plugins": ["prettier"],
