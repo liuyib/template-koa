@@ -1,7 +1,8 @@
 const { LOGIN_TYPE } = require('~lib/enum')
+const config = require('~config/setting')
 const { EmailService } = require('./email')
 
-const SESSION_KEY = 'vcode#auth'
+const VCODE_SESSION_KEY = config.vcode.sessionKey
 
 class VcodeService {
   /**
@@ -13,7 +14,7 @@ class VcodeService {
    * @returns {string} 验证码
    */
   static async sendVcode({ type, email, telephone }) {
-    const session = __SESSION__[SESSION_KEY] || {}
+    const session = __SESSION__[VCODE_SESSION_KEY] || {}
     const account = email || telephone
     let vcode = session.vcode
 
@@ -37,13 +38,13 @@ class VcodeService {
   }
 
   static async verifyVcode({ type, account, vcode, userId }) {
-    const session = __SESSION__[SESSION_KEY]
+    const session = __SESSION__[VCODE_SESSION_KEY]
 
     if (!session) {
       throw new __ERROR__.VcodeException('还未获取验证码')
     }
 
-    const { account: a, vcode: v } = __SESSION__[SESSION_KEY]
+    const { account: a, vcode: v } = __SESSION__[VCODE_SESSION_KEY]
 
     if (a !== account || v !== vcode) {
       throw new __ERROR__.VcodeException('验证码错误')
@@ -67,7 +68,7 @@ class VcodeService {
   }
 
   static _storeVcode({ account, vcode }) {
-    __SESSION__[SESSION_KEY] = {
+    __SESSION__[VCODE_SESSION_KEY] = {
       account,
       vcode,
       timestamp: Date.now(),

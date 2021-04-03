@@ -64,5 +64,6 @@ module.exports = {
   vcode: {
     // 验证码允许发送的间隔时间（单位 s）
     interval: 60,
+    sessionKey: 'vcode#auth',
   },
 }

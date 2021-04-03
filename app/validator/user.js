@@ -1,9 +1,11 @@
 const validator = require('validator')
 const { LinValidator, Rule } = require('~lib/validator')
+const config = require('~config/setting')
 const { isEmpty } = require('~lib/isType')
 const { LOGIN_TYPE } = require('~lib/enum')
 const { User } = require('~model/user')
 
+const VCODE_SESSION_KEY = config.vcode.sessionKey
 const { locales } = __CONFIG__.validate.mobilePhone
 
 class UtilValidator extends LinValidator {
@@ -134,7 +136,7 @@ class SignupValidator extends AuthValidator {
 
   async validateParams(req) {
     const { type, email, telephone, secret, vcode } = req.body
-    const signup = __SESSION__['vcode#auth'] || {}
+    const signup = __SESSION__[VCODE_SESSION_KEY] || {}
 
     this.verifyType(req)
 
