@@ -1,12 +1,49 @@
 const validator = require('validator')
 const { LinValidator, Rule } = require('~lib/validator')
-const { isEmpty } = require('~lib/util')
+const { isEmpty } = require('~lib/isType')
 const { LOGIN_TYPE } = require('~lib/enum')
 const { User } = require('~model/user')
 
 const { locales } = __CONFIG__.validate.mobilePhone
 
-class AuthValidator extends LinValidator {
+class UtilValidator extends LinValidator {
+  isAccountType(type) {
+    return type === LOGIN_TYPE.ACCOUNT
+  }
+
+  isMobilePhoneType(type) {
+    return type === LOGIN_TYPE.MOBILE_PHONE
+  }
+
+  isEmail(val) {
+    return validator.isEmail(val)
+  }
+
+  isPhone(val) {
+    return validator.isMobilePhone(val, locales)
+  }
+
+  verifyType(req) {
+    const { type, email, telephone } = req.body
+
+    if (typeof type !== 'number') {
+      throw new __ERROR__.ParamException('type 参数只能是数字')
+    }
+    if (this.isAccountType(type)) {
+      if (isEmpty(email)) {
+        throw new __ERROR__.ParamException(`请传入 email 参数`)
+      }
+    } else if (this.isMobilePhoneType(type)) {
+      if (isEmpty(telephone)) {
+        throw new __ERROR__.ParamException('请传入 telephone 参数')
+      }
+    } else {
+      throw new __ERROR__.ParamException(`未定义 type: ${type} 的处理逻辑`)
+    }
+  }
+}
+
+class AuthValidator extends UtilValidator {
   constructor() {
     super()
     this.type = [
@@ -48,38 +85,6 @@ class AuthValidator extends LinValidator {
       new Rule('isNumeric', '验证码只允许是数字', { no_symbols: true }),
     ]
   }
-
-  isAccountType(type) {
-    return type === LOGIN_TYPE.ACCOUNT
-  }
-
-  isMobilePhoneType(type) {
-    return type === LOGIN_TYPE.MOBILE_PHONE
-  }
-
-  isEmail(val) {
-    return validator.isEmail(val)
-  }
-
-  isPhone(val) {
-    return validator.isMobilePhone(val, locales)
-  }
-
-  verifyType(req) {
-    const { type, email, telephone } = req.body
-
-    if (this.isAccountType(type)) {
-      if (isEmpty(email)) {
-        throw new __ERROR__.ParamException(`请传入 email 参数`)
-      }
-    } else if (this.isMobilePhoneType(type)) {
-      if (isEmpty(telephone)) {
-        throw new __ERROR__.ParamException('请传入 telephone 参数')
-      }
-    } else {
-      throw new __ERROR__.ParamException(`未定义 type: ${type} 的处理逻辑`)
-    }
-  }
 }
 
 /**
@@ -90,6 +95,29 @@ class AuthValidator extends LinValidator {
 class VcodeValidator extends AuthValidator {
   validateAccount(req) {
     this.verifyType(req)
+  }
+}
+
+/**
+ * 验证验证码。传 type + vcode 参数
+ */
+class VcodeVerifyValidator extends AuthValidator {
+  constructor() {
+    super()
+    this.vcode = [
+      new Rule('isLength', '验证码不能为空', { min: 1 }),
+      new Rule('isNumeric', '验证码只允许是数字'),
+    ]
+  }
+
+  validateAccount(req) {
+    const { type, account } = req.body
+
+    if (type === LOGIN_TYPE.ACCOUNT && !this.isEmail(account)) {
+      throw new __ERROR__.ParamException('请输入正确的邮箱')
+    } else if (type === LOGIN_TYPE.MOBILE_PHONE && !this.isPhone(account)) {
+      throw new __ERROR__.ParamException('请输入正确的手机号')
+    }
   }
 }
 
@@ -106,7 +134,7 @@ class SignupValidator extends AuthValidator {
 
   async validateParams(req) {
     const { type, email, telephone, secret, vcode } = req.body
-    const signup = this.ctx.session.signup || {}
+    const signup = __SESSION__['vcode#auth'] || {}
 
     this.verifyType(req)
 
@@ -178,6 +206,7 @@ class LoginValidator extends AuthValidator {
 
 module.exports = {
   VcodeValidator,
+  VcodeVerifyValidator,
   SignupValidator,
   LoginValidator,
 }

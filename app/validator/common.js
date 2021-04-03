@@ -34,8 +34,25 @@ class PaginationValidator extends LinValidator {
   }
 }
 
+class AddressValidator extends LinValidator {
+  constructor() {
+    super()
+    this.contactProvince = [
+      new Rule('isLength', '地址中【省/直辖市】不能为空', { min: 1 }),
+    ]
+    this.contactCity = [
+      new Rule('isLength', '地址中【市】不能为空', { min: 1 }),
+    ]
+    this.contactCounty = [
+      new Rule('isLength', '地址中【区/县】不能为空', { min: 1 }),
+    ]
+    this.contactDetail = [new Rule('isLength', '详细地址不能为空', { min: 1 })]
+  }
+}
+
 module.exports = {
   PositiveIntegerValidator,
   NotEmptyValidator,
   PaginationValidator,
+  AddressValidator,
 }

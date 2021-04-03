@@ -44,6 +44,18 @@ class Success extends HttpException {
   }
 }
 
+class UserException extends HttpException {
+  constructor(msg = '用户信息修改失败', code = __CODE__.USER_FAILED) {
+    super(msg, code)
+  }
+}
+
+class AssetsException extends HttpException {
+  constructor(msg = '文件上传失败', code = __CODE__.ASSETS_FAILED) {
+    super(msg, code)
+  }
+}
+
 class VcodeException extends HttpException {
   constructor(msg = '验证码发送失败', code = __CODE__.VCODE_FAILED) {
     super(msg, code)
@@ -56,6 +68,11 @@ class SignupException extends HttpException {
   }
 }
 
+class AddressException extends HttpException {
+  constructor(msg = '收货地址添加失败', code = __CODE__.ADDRESS_FAILED) {
+    super(msg, code)
+  }
+}
 module.exports = {
   HttpException,
   ParamException,
@@ -63,6 +80,9 @@ module.exports = {
   Forbbiden,
   AuthFailed,
   Success,
+  UserException,
+  AssetsException,
   VcodeException,
   SignupException,
+  AddressException,
 }

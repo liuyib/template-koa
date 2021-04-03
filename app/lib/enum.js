@@ -64,10 +64,16 @@ const HTTP_CODE = {
    */
   // 用户不存在
   USER_NOTFOUND: 10904,
+  // 用户相关逻辑失败（用户不存在除外）
+  USER_FAILED: 10900,
+  // 资源上传失败
+  ASSETS_FAILED: 10920,
   // 验证码发送失败
   VCODE_FAILED: 11001,
   // 账号注册失败
   SIGNUP_FAILED: 11011,
+  // 收货地址相关逻辑失败
+  ADDRESS_FAILED: 11030,
 }
 
 module.exports = {
