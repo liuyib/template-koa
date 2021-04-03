@@ -22,9 +22,13 @@ class WXService {
       }
 
       const { openid } = data
-      const user = await User.findOrCreate({ where: { openid } })
+      let user = await User.getData({ openid })
 
-      return genToken(user[0].id, __AUTH__.USER)
+      if (!user) {
+        user = await User.addData({ openid })
+      }
+
+      return genToken(user.id, __AUTH__.USER)
     } catch (error) {
       throw new __ERROR__.AuthFailed(error.message || 'openid 获取失败')
     }
