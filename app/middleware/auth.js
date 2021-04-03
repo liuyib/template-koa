@@ -59,10 +59,8 @@ class Auth {
       const { secretKey } = __CONFIG__.jwt
       jwt.verify(token, secretKey)
     } catch (error) {
-      return false
+      throw new __ERROR__.ParamException('token 不合法')
     }
-
-    return true
   }
 }
 

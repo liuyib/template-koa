@@ -22,18 +22,12 @@ router.post('/', async (ctx) => {
  * 验证 Token
  */
 router.post('/verify', async (ctx) => {
-  const v = await new VerifyValidator().validate(ctx, {
-    key: 'token',
-  })
-  const isTokenValid = Auth.verifyToken(v.get('body.token'))
+  const v = await new VerifyValidator().validate(ctx, { key: 'token' })
+  Auth.verifyToken(v.get('body.token'))
 
-  if (isTokenValid) {
-    success({
-      msg: 'token 合法',
-    })
-  } else {
-    throw new __ERROR__.ParamException('token 不合法')
-  }
+  success({
+    msg: 'token 合法',
+  })
 })
 
 module.exports = router
