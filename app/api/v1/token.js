@@ -1,9 +1,10 @@
 const Router = require('koa-router')
-const router = new Router({ prefix: '/v1/token' })
 const { Auth } = require('~middleware/auth')
 const { TokenValidator, VerifyValidator } = require('~validator/token')
 const { Token } = require('~model/token')
 const { success } = require('~lib/util')
+
+const router = new Router({ prefix: '/v1/token' })
 
 /**
  * 获取 Token

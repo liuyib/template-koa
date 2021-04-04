@@ -33,6 +33,24 @@ function readFile(filePath, fileTrace = filePath) {
 }
 
 /**
+ * 递归创建文件夹
+ * @param {string} dir - 文件目录
+ * @returns {boolean}
+ */
+function mkdirsSync(dir) {
+  if (fs.existsSync(dir)) {
+    return true
+  }
+
+  if (mkdirsSync(path.dirname(dir))) {
+    fs.mkdirSync(dir)
+    return true
+  }
+
+  return false
+}
+
+/**
  * 生成 JWT
  * @param {(string|number)} uid - 用户唯一标识
  * @param {number} permission   - 用户权限标识（数值越大，权限越高）
@@ -138,6 +156,7 @@ function snakeCaseObj(target) {
 
 module.exports = {
   readFile,
+  mkdirsSync,
   genToken,
   genRandom,
   success,

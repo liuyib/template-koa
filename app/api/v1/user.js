@@ -1,5 +1,4 @@
 const Router = require('koa-router')
-const router = new Router({ prefix: '/v1/user' })
 const {
   VcodeValidator,
   SignupValidator,
@@ -8,6 +7,8 @@ const {
 const { User } = require('~model/user')
 const { Token } = require('~model/token')
 const { success } = require('~lib/util')
+
+const router = new Router({ prefix: '/v1/user' })
 
 router.post('/vcode', async (ctx) => {
   const v = await new VcodeValidator().validate(ctx)

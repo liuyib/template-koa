@@ -33,13 +33,15 @@
   "homepage": "https://github.com/liuyib/koa-template",
   "dependencies": {
     "@koa/cors": "^3.1.0",
+    "async-busboy": "^1.0.1",
     "axios": "^0.21.1",
     "basic-auth": "^2.0.1",
     "bcryptjs": "^2.4.3",
+    "dayjs": "^1.10.4",
     "dotenv": "^8.2.0",
     "jsonwebtoken": "^8.5.1",
     "koa": "^2.13.1",
-    "koa-body": "^4.2.0",
+    "koa-bodyparser": "^4.3.0",
     "koa-router": "^10.0.0",
     "koa-session": "^6.1.0",
     "koa-static": "^5.0.0",
@@ -49,6 +51,7 @@
     "nodemailer": "^6.5.0",
     "sequelize": "^6.3.5",
     "uid": "^2.0.0",
+    "uuid": "^8.3.2",
     "validator": "^13.5.2"
   },
   "devDependencies": {
@@ -73,6 +76,8 @@
     "~middleware": "app/middleware",
     "~model": "app/model",
     "~service": "app/service",
-    "~validator": "app/validator"
+    "~validator": "app/validator",
+    "~extension": "app/extension",
+    "~core": "app/core"
   }
 }
