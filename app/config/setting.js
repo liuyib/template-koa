@@ -71,7 +71,9 @@ module.exports = {
   },
   file: {
     // 文件上传目录。可以是完整路径、相对路径
-    uploadDir: '/public/upload/',
+    uploadDir: '/public/upload',
+    // 访问文件时的路径前缀
+    baseUrl: '/upload',
     // 是否使用 UUID 重命名文件
     rename: true,
     // 是否按年月日新建文件夹来分类保存

@@ -1,3 +1,4 @@
+const _ = require('lodash')
 const uuid = require('uuid')
 const dayjs = require('dayjs')
 const path = require('path')
@@ -8,10 +9,11 @@ const util = require('~lib/util')
 const rootDir = config.path.root
 
 class LocalUploader {
-  constructor({ uploadDir, rename, archive } = {}) {
-    this.uploadDir = uploadDir || config.file.uploadDir
-    this.rename = rename || config.file.rename
-    this.archive = archive || config.file.archive
+  constructor({ uploadDir, baseUrl, rename, archive } = {}) {
+    this.uploadDir = uploadDir || _.get(config, 'file.uploadDir')
+    this.baseUrl = baseUrl || _.get(config, 'file.baseUrl')
+    this.rename = rename || _.get(config, 'file.rename')
+    this.archive = archive || _.get(config, 'file.archive')
 
     this.checkUploadDir()
   }
@@ -34,8 +36,8 @@ class LocalUploader {
   }
 
   getArchiveDir() {
-    const { uploadDir, archive, genFormatDate } = this
-    let archivePath = uploadDir
+    const { uploadDir, baseUrl, archive, genFormatDate } = this
+    let archivePath = baseUrl
     let archiveFullpath = path.join(rootDir, uploadDir)
 
     if (archive) {

@@ -11,11 +11,12 @@ class Uploader extends LocalUploader {
     for (const file of files) {
       const md5 = this.genMd5(file.buffer)
       const exist = await FileModel.getData({ sign: md5 })
+      const host = `${config.host}:${config.port}`
 
       if (exist) {
         uploaded.push({
           ...exist.dataValues,
-          url: `${config.host}:${config.port}${exist.path}`,
+          url: new URL(`${host}${exist.path}`).href,
         })
       } else {
         const { filePath, fullPath, newName } = this.getUploadPath(
@@ -36,7 +37,7 @@ class Uploader extends LocalUploader {
 
         uploaded.push({
           ...saved.dataValues,
-          url: `${config.host}:${config.port}${saved.path}`,
+          url: new URL(`${host}${saved.path}`).href,
         })
       }
     }
