@@ -107,15 +107,13 @@ function success(param) {
  */
 function pagination(data = [], start = 0, count = 20) {
   const subData = data.slice(start, start + count)
-  const totalCount = subData.length || 0
-  const totalPage = Math.ceil(totalCount / count)
-
   const result = {
     data: subData,
+    start,
+    // 实际获取到的数量（如：期望获取 20 条，但实际可能只有 10 条数据）
+    count: subData.length || 0,
     // 数据总量
-    totalCount,
-    // 总页数
-    totalPage,
+    total: data.length || 0,
   }
 
   return result
